@@ -9,7 +9,7 @@ import {
 
 type TitleAlign = "left" | "center" | "right";
 
-interface ButtonProps extends ViewProps, TouchableOpacityProps {
+export interface ButtonProps extends ViewProps, TouchableOpacityProps {
   title: string;
   titleAlign?: TitleAlign;
 }

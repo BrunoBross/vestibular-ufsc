@@ -1,27 +1,40 @@
-import { Button } from "@/components/ui/button";
+import { LoginModel, loginSchema } from "@/components/screens/home/validator";
+import { Form } from "@/components/ui/form";
 import { ScreenContainer } from "@/components/ui/screen-container";
-import { Text, TextInput, View } from "react-native";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { View } from "react-native";
 
 export default function LoginScreen() {
+  const { control, handleSubmit } = useForm<LoginModel>({
+    resolver: zodResolver(loginSchema),
+  });
+
+  const onSubmit = (values: any) => {
+    console.log(values);
+  };
+
   return (
     <ScreenContainer title="Área do Candidato">
       <View className="pt-32 gap-y-4">
-        <View className="gap-y-1">
-          <Text className="font-semibold">CPF</Text>
-          <TextInput
-            className="px-4 py-2 bg-white rounded-md shadow-md"
-            placeholder="000.000.000-00"
-          />
-        </View>
-        <View className="gap-y-1">
-          <Text className="font-semibold">CPF</Text>
-          <TextInput
-            className="px-4 py-2 bg-white rounded-md shadow-md"
-            placeholder="**********"
-            secureTextEntry={true}
-          />
-        </View>
-        <Button title="Entrar" titleAlign="center" />
+        <Form.MaskedInput
+          name="cpf"
+          control={control}
+          type="cpf"
+          maxLength={14}
+          placeholder="000.000.000-00"
+        />
+        <Form.Input
+          name="password"
+          control={control}
+          placeholder="**********"
+          secureTextEntry={true}
+        />
+        <Form.SubmitButton
+          title="Entrar"
+          titleAlign="center"
+          onPress={handleSubmit(onSubmit, console.log)}
+        />
       </View>
     </ScreenContainer>
   );

@@ -1,5 +1,5 @@
 import HeaderImage from "@/assets/images/app/header.png";
-import { EventCard } from "@/components/ui/screens/event-card";
+import { EventCard } from "@/components/screens/home/event-card";
 import { Feather } from "@expo/vector-icons";
 import { Image, ScrollView, Text, View } from "react-native";
 import colors from "tailwindcss/colors";
@@ -19,9 +19,6 @@ export default function HomeScreen() {
           <Text className="text-white">Processos Seletivos</Text>
         </View>
 
-        <EventCard />
-        <EventCard />
-        <EventCard />
         <EventCard />
       </View>
     </ScrollView>
