@@ -3,7 +3,7 @@ import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { useColorScheme } from "nativewind";
 import { useEffect } from "react";
-import { View } from "react-native";
+import { StatusBar, View } from "react-native";
 import "react-native-reanimated";
 
 SplashScreen.preventAutoHideAsync();
@@ -27,6 +27,7 @@ export default function RootLayout() {
 
   return (
     <View className="w-screen h-screen bg-background">
+      <StatusBar barStyle="dark-content" />
       <Stack>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="+not-found" />

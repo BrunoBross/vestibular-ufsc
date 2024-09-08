@@ -3,17 +3,15 @@ import React from "react";
 import colors from "tailwindcss/colors";
 
 import { Feather } from "@expo/vector-icons";
-import { useColorScheme } from "nativewind";
 
 export default function TabLayout() {
-  const { colorScheme } = useColorScheme();
-
   return (
     <Tabs
       screenOptions={{
         tabBarActiveTintColor: colors.black,
-        tabBarInactiveTintColor: colors.gray[600],
+        tabBarInactiveTintColor: colors.zinc[400],
         headerShown: false,
+        tabBarShowLabel: false,
       }}
     >
       <Tabs.Screen
@@ -21,6 +19,22 @@ export default function TabLayout() {
         options={{
           tabBarIcon: ({ color }) => (
             <Feather name="home" color={color} size={22} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="notification"
+        options={{
+          tabBarIcon: ({ color }) => (
+            <Feather name="bell" color={color} size={22} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="login"
+        options={{
+          tabBarIcon: ({ color }) => (
+            <Feather name="user" color={color} size={22} />
           ),
         }}
       />
