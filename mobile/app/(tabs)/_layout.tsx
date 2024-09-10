@@ -12,6 +12,9 @@ export default function TabLayout() {
         tabBarInactiveTintColor: colors.zinc[400],
         headerShown: false,
         tabBarShowLabel: false,
+        tabBarStyle: {
+          height: 60,
+        },
       }}
     >
       <Tabs.Screen

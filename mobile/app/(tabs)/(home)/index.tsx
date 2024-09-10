@@ -1,5 +1,6 @@
 import HeaderImage from "@/assets/images/app/header.png";
 import { EventCard } from "@/components/screens/home/event-card";
+import { useAuth } from "@/contexts/auth/auth-context";
 import { axios } from "@/lib/axios";
 import { Feather } from "@expo/vector-icons";
 import { useEffect, useState } from "react";
@@ -21,18 +22,19 @@ export interface Event {
   registrationStartDate: Date;
   registrationEndDate: Date;
   coursesAmount: number;
+  modalities: string;
   examList: Exam[];
 }
 
 export default function HomeScreen() {
   const [eventList, setEventList] = useState<Event[]>([]);
+  const { token } = useAuth();
 
   const fetchEventList = async () => {
-    console.log("fetch");
+    console.log(token);
     await axios
       .get("/event")
       .then(({ data }) => {
-        console.log(data);
         setEventList(data.eventList);
       })
       .catch((error) => {
@@ -42,7 +44,7 @@ export default function HomeScreen() {
 
   useEffect(() => {
     fetchEventList();
-  }, []);
+  }, [token]);
 
   return (
     <ScrollView>

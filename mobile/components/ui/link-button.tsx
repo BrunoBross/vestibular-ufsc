@@ -1,11 +1,8 @@
 import { Href, router } from "expo-router";
-import { ReactNode } from "react";
-import { BaseButton } from "./base-button";
+import { BaseButton, BaseButtonProps } from "./base-button";
 
-interface LinkButtonProps {
+interface LinkButtonProps extends BaseButtonProps {
   href: Href;
-  children: ReactNode;
-  rippleColor?: string;
 }
 
 export function LinkButton(props: LinkButtonProps) {
@@ -16,7 +13,7 @@ export function LinkButton(props: LinkButtonProps) {
   };
 
   return (
-    <BaseButton rippleColor={rippleColor || "#52525b40"} onPress={onClick}>
+    <BaseButton rippleColor={rippleColor || "#52525b30"} onPress={onClick}>
       {children}
     </BaseButton>
   );

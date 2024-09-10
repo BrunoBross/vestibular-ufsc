@@ -19,9 +19,9 @@ export function Button(props: ButtonProps) {
 
   return (
     <View {...rest}>
-      <BaseButton rippleColor="#6993FF" {...rest}>
+      <BaseButton {...rest}>
         <View
-          className={clsx("p-4 bg-blue-200 rounded-md", {
+          className={clsx("p-4 bg-sky-500 rounded-md", {
             "items-center": titleAlign === "center",
             "items-start": titleAlign === "left",
             "items-end": titleAlign === "right",

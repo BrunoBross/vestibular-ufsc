@@ -1,3 +1,4 @@
+import { AuthProvider } from "@/contexts/auth-context";
 import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
@@ -24,13 +25,15 @@ export default function RootLayout() {
   }
 
   return (
-    <View className="w-screen h-screen bg-background">
-      <ExpoStatusBar style="dark" />
+    <AuthProvider>
+      <View className="w-screen h-screen">
+        <ExpoStatusBar style="dark" />
 
-      <Stack screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="(tabs)" />
-        <Stack.Screen name="+not-found" />
-      </Stack>
-    </View>
+        <Stack screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="(tabs)" />
+          <Stack.Screen name="+not-found" />
+        </Stack>
+      </View>
+    </AuthProvider>
   );
 }

@@ -4,7 +4,7 @@ import {
 } from "react-native";
 
 export interface BaseButtonProps extends TouchableNativeFeedbackProps {
-  rippleColor: string;
+  rippleColor?: string;
 }
 
 export function BaseButton(props: BaseButtonProps) {
@@ -12,7 +12,10 @@ export function BaseButton(props: BaseButtonProps) {
 
   return (
     <TouchableNativeFeedback
-      background={TouchableNativeFeedback.Ripple(rippleColor, false)}
+      background={TouchableNativeFeedback.Ripple(
+        rippleColor || "#52525b30",
+        false
+      )}
       {...rest}
     >
       {children}

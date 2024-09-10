@@ -45,7 +45,7 @@ export function Input(props: MaskedInputProps) {
         />
       )}
       {error && (
-        <Text className="font-medium text-red-200">{error.message}</Text>
+        <Text className="font-medium text-red-500">{error.message}</Text>
       )}
     </View>
   );

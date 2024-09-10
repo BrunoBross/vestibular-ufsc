@@ -1,4 +1,5 @@
 import { Event } from "@/app/(tabs)/(home)/index";
+import { Badge } from "@/components/ui/badge";
 import { LinkButton } from "@/components/ui/link-button";
 import { formatFullDate } from "@/utils/format-date";
 import { Feather } from "@expo/vector-icons";
@@ -13,7 +14,7 @@ export function EventCard(props: EventCardProps) {
   const { event, ...rest } = props;
 
   return (
-    <LinkButton href="/event/1">
+    <LinkButton href={`/event/${event.id}`}>
       <View className="flex-row p-4 bg-white rounded-md shadow-md" {...rest}>
         <View className="items-start w-full gap-y-1">
           {/* <Text className="text-base font-semibold text-blue-100 uppercase">
@@ -37,16 +38,11 @@ export function EventCard(props: EventCardProps) {
               {exam.description} - {formatFullDate(exam.examStartDate)}
             </Text>
           ))}
-          <View className="px-2 py-1 bg-red-100 rounded-md">
-            <Text className="text-xs text-red-200">
-              Incrição não efetivada por falta de pagamento
-            </Text>
-          </View>
-          <View className="px-2 py-1 bg-red-100 rounded-md">
-            <Text className="text-xs text-red-200">
-              Período de inscrição encerrado
-            </Text>
-          </View>
+          <Badge
+            text="Incrição não efetivada por falta de pagamento"
+            type="danger"
+          />
+          <Badge text="Período de inscrição encerrado" type="danger" />
         </View>
       </View>
     </LinkButton>

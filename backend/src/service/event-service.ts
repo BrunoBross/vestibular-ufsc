@@ -16,6 +16,7 @@ interface Event {
   registrationStartDate: Date;
   registrationEndDate: Date;
   coursesAmount: number;
+  modalities: string;
   examList: Exam[];
 }
 
@@ -45,6 +46,7 @@ export const getEventList = async () => {
       coursesAmount: event.qtd_cursos,
       examList: parsedExamList,
       registrationCost: event.valor_inscricao,
+      modalities: event.modalidade_provas,
       registrationStartDate: convertStringToDate(event.data_inicio_inscricao),
       registrationEndDate: convertStringToDate(event.data_fim_inscricao),
     };
