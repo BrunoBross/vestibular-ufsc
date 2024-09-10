@@ -4,7 +4,7 @@ import { useAuth } from "@/contexts/auth/auth-context";
 import { axios } from "@/lib/axios";
 import { Feather } from "@expo/vector-icons";
 import { useEffect, useState } from "react";
-import { Image, ScrollView, Text, View } from "react-native";
+import { Image, RefreshControl, ScrollView, Text, View } from "react-native";
 import colors from "tailwindcss/colors";
 
 // tentar pegar a tipagem do backend :D
@@ -27,11 +27,12 @@ export interface Event {
 }
 
 export default function HomeScreen() {
-  const [eventList, setEventList] = useState<Event[]>([]);
   const { token } = useAuth();
+  const [eventList, setEventList] = useState<Event[]>([]);
+  const [isFetching, setIsFetching] = useState(false);
 
   const fetchEventList = async () => {
-    console.log(token);
+    setIsFetching(true);
     await axios
       .get("/event")
       .then(({ data }) => {
@@ -39,6 +40,9 @@ export default function HomeScreen() {
       })
       .catch((error) => {
         console.log(error);
+      })
+      .finally(() => {
+        setIsFetching(false);
       });
   };
 
@@ -47,7 +51,11 @@ export default function HomeScreen() {
   }, [token]);
 
   return (
-    <ScrollView>
+    <ScrollView
+      refreshControl={
+        <RefreshControl refreshing={isFetching} onRefresh={fetchEventList} />
+      }
+    >
       <Image source={HeaderImage} className="absolute" />
       <View className="p-4 pt-16 gap-y-4">
         <Text className="text-base font-semibold text-white">

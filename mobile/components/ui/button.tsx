@@ -1,4 +1,5 @@
 import clsx from "clsx";
+import { ReactNode } from "react";
 import {
   Text,
   TouchableNativeFeedbackProps,
@@ -11,22 +12,24 @@ type TitleAlign = "left" | "center" | "right";
 
 export interface ButtonProps extends ViewProps, TouchableNativeFeedbackProps {
   title: string;
+  icon?: ReactNode;
   titleAlign?: TitleAlign;
 }
 
 export function Button(props: ButtonProps) {
-  const { title, titleAlign = "left", ...rest } = props;
+  const { title, icon, titleAlign = "left", ...rest } = props;
 
   return (
     <View {...rest}>
       <BaseButton {...rest}>
         <View
-          className={clsx("p-4 bg-sky-500 rounded-md", {
-            "items-center": titleAlign === "center",
-            "items-start": titleAlign === "left",
-            "items-end": titleAlign === "right",
+          className={clsx("p-4 flex-row bg-sky-500 items-center rounded-md", {
+            "justify-center": titleAlign === "center",
+            "justify-start": titleAlign === "left",
+            "justify-end": titleAlign === "right",
           })}
         >
+          {icon && <View className="mr-2">{icon}</View>}
           <Text className="font-semibold text-white">{title}</Text>
         </View>
       </BaseButton>

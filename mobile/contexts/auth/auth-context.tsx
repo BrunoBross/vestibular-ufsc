@@ -1,6 +1,7 @@
 import { LoginModel } from "@/components/screens/login/validator";
 import { axios } from "@/lib/axios";
-import { createContext, ReactNode, useContext, useState } from "react";
+import { createContext, ReactNode, useContext, useEffect } from "react";
+import { useAuthStore } from "./auth-storage";
 
 interface AuthContextType {
   token?: string;
@@ -17,21 +18,28 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider(props: AuthProviderProps) {
   const { children } = props;
 
-  const [token, setToken] = useState<string>();
+  const { token, setToken, clearToken } = useAuthStore();
 
   const login = async (values: LoginModel) => {
     await axios
       .post("/login", values)
       .then(({ data }) => {
         setToken(data.token);
-        axios.defaults.headers.Authorization = `Bearer ${data.token}`;
       })
       .catch((error) => console.log(error));
   };
 
   const logout = () => {
-    setToken(undefined);
+    clearToken();
   };
+
+  useEffect(() => {
+    if (token) {
+      axios.defaults.headers.Authorization = `Bearer ${token}`;
+    } else {
+      axios.defaults.headers.Authorization = null;
+    }
+  }, [token]);
 
   return (
     <AuthContext.Provider value={{ token, login, logout }}>

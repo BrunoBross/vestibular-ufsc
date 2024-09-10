@@ -1,8 +1,11 @@
 import { Event } from "@/app/(tabs)/(home)/index";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { ScreenContainer } from "@/components/ui/screen-container";
 import { axios } from "@/lib/axios";
 import { formatFullDate } from "@/utils/format-date";
+import { Feather } from "@expo/vector-icons";
+import { openURL } from "expo-linking";
 import { useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
 import { ActivityIndicator, Text, View } from "react-native";
@@ -21,6 +24,10 @@ export default function EventDetailsScreen() {
       .catch((error) => {
         console.log(error);
       });
+  };
+
+  const handleEventSubscribe = () => {
+    openURL(`https://vestibular.coperve.ufsc.br/inscricao/evento/${id}/dados`);
   };
 
   useEffect(() => {
@@ -86,6 +93,13 @@ export default function EventDetailsScreen() {
               <Text>{event.coursesAmount} cursos</Text>
             </View>
           </View>
+
+          <Button
+            title="Inscrição"
+            titleAlign="center"
+            icon={<Feather name="edit" color={colors.white} size={18} />}
+            onPress={handleEventSubscribe}
+          />
         </View>
       ) : (
         <View className="items-center justify-center w-full h-full">

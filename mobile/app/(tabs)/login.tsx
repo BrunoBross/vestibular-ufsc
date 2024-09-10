@@ -1,4 +1,5 @@
 import { LoginModel, loginSchema } from "@/components/screens/login/validator";
+import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import { ScreenContainer } from "@/components/ui/screen-container";
 import { useAuth } from "@/contexts/auth/auth-context";
@@ -11,7 +12,7 @@ export default function LoginScreen() {
     resolver: zodResolver(loginSchema),
   });
 
-  const { login, token } = useAuth();
+  const { login, token, logout } = useAuth();
 
   const onSubmit = async (values: LoginModel) => {
     await login(values);
@@ -20,7 +21,10 @@ export default function LoginScreen() {
   return (
     <ScreenContainer title="Área do Candidato">
       {token ? (
-        <Text>Usuário logado</Text>
+        <>
+          <Text>Usuário logado</Text>
+          <Button title="Deslogar" onPress={logout} />
+        </>
       ) : (
         <View className="pt-32 gap-y-4">
           <Form.Input
