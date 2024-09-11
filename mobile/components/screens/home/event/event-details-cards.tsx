@@ -28,8 +28,8 @@ export function EventDetailsCards(props: EventDetailsCardsProps) {
     <View className="space-y-4">
       <Card className="items-start space-y-2">
         <Text className="font-bold">{event.eventName}</Text>
-        <Badge text="Incrição não realizada" type="danger" />
-        <Badge text="Período de inscrição encerrado" type="danger" />
+        <Badge text="Incrição não realizada" badgeType="danger" />
+        <Badge text="Período de inscrição encerrado" badgeType="danger" />
       </Card>
 
       <EventActions />

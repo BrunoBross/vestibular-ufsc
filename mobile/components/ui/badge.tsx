@@ -4,7 +4,7 @@ import { tv, VariantProps } from "tailwind-variants";
 const badgeVariants = tv({
   base: "px-2 py-1 rounded-md",
   variants: {
-    type: {
+    badgeType: {
       info: "bg-blue-200/60",
       warning: "bg-orange-200/60",
       danger: "bg-red-200/60",
@@ -16,7 +16,7 @@ const badgeVariants = tv({
 const badgeTextVariants = tv({
   base: "text-xs font-medium",
   variants: {
-    type: {
+    badgeType: {
       info: "text-blue-600",
       warning: "text-orange-600",
       danger: "text-red-600",
@@ -30,11 +30,11 @@ interface BadgeProps extends ViewProps, VariantProps<typeof badgeVariants> {
 }
 
 export function Badge(props: BadgeProps) {
-  const { text, type = "info", ...rest } = props;
+  const { text, badgeType = "info", ...rest } = props;
 
   return (
-    <View className={badgeVariants({ type })} {...rest}>
-      <Text className={badgeTextVariants({ type })}>{text}</Text>
+    <View className={badgeVariants({ badgeType })} {...rest}>
+      <Text className={badgeTextVariants({ badgeType })}>{text}</Text>
     </View>
   );
 }

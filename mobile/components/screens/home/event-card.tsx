@@ -42,9 +42,9 @@ export function EventCard(props: EventCardProps) {
         </View>
         <Badge
           text="Incrição não efetivada por falta de pagamento"
-          type="danger"
+          badgeType="danger"
         />
-        <Badge text="Período de inscrição encerrado" type="danger" />
+        <Badge text="Período de inscrição encerrado" badgeType="danger" />
       </Card>
     </LinkButton>
   );

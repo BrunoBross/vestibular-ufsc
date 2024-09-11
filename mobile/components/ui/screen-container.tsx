@@ -24,21 +24,20 @@ export function ScreenContainer(props: ScreenContainerProps) {
 
   return (
     <View
-      className="h-full p-4 pb-0"
+      className="h-full p-4 pb-0 space-y-4"
       style={{ paddingTop: StatusBar.currentHeight! + 20 }}
-      {...rest}
     >
-      {(canGoBack || title) && (
+      {canGoBack && (
         <View className="flex-row items-center gap-x-2">
-          {canGoBack && (
-            <TouchableOpacity onPress={handleGoBack}>
-              <Feather name="arrow-left" size={22} />
-            </TouchableOpacity>
-          )}
+          <TouchableOpacity onPress={handleGoBack}>
+            <Feather name="arrow-left" size={22} />
+          </TouchableOpacity>
 
-          {title && <Text className="text-base font-bold ">{title}</Text>}
+          <Text className="text-base font-bold ">Voltar</Text>
         </View>
       )}
+
+      {title && <Text className="text-base font-bold ">{title}</Text>}
 
       <ScrollView
         className={twMerge("mt-2", className)}
