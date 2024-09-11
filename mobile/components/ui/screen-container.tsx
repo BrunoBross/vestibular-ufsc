@@ -1,12 +1,14 @@
 import { Feather } from "@expo/vector-icons";
 import { router } from "expo-router";
 import {
+  ScrollView,
   StatusBar,
   Text,
   TouchableOpacity,
   View,
   ViewProps,
 } from "react-native";
+import { twMerge } from "tailwind-merge";
 
 interface ScreenContainerProps extends ViewProps {
   title?: string;
@@ -14,7 +16,7 @@ interface ScreenContainerProps extends ViewProps {
 }
 
 export function ScreenContainer(props: ScreenContainerProps) {
-  const { title, canGoBack, children, ...rest } = props;
+  const { title, canGoBack, className, children, ...rest } = props;
 
   const handleGoBack = () => {
     router.back();
@@ -22,21 +24,29 @@ export function ScreenContainer(props: ScreenContainerProps) {
 
   return (
     <View
-      className="w-full h-full p-4"
-      style={{ marginTop: StatusBar.currentHeight }}
+      className="h-full p-4 pb-0"
+      style={{ paddingTop: StatusBar.currentHeight! + 20 }}
       {...rest}
     >
-      <View className="flex-row items-center gap-x-2">
-        {canGoBack && (
-          <TouchableOpacity onPress={handleGoBack}>
-            <Feather name="arrow-left" size={22} />
-          </TouchableOpacity>
-        )}
+      {(canGoBack || title) && (
+        <View className="flex-row items-center gap-x-2">
+          {canGoBack && (
+            <TouchableOpacity onPress={handleGoBack}>
+              <Feather name="arrow-left" size={22} />
+            </TouchableOpacity>
+          )}
 
-        {title && <Text className="text-base font-bold ">{title}</Text>}
-      </View>
+          {title && <Text className="text-base font-bold ">{title}</Text>}
+        </View>
+      )}
 
-      <View className="mt-2">{children}</View>
+      <ScrollView
+        className={twMerge("mt-2", className)}
+        contentContainerStyle={{ paddingBottom: 64 }}
+        showsVerticalScrollIndicator={false}
+      >
+        {children}
+      </ScrollView>
     </View>
   );
 }

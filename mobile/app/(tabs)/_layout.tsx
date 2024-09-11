@@ -4,19 +4,19 @@ import colors from "tailwindcss/colors";
 
 import { Feather } from "@expo/vector-icons";
 
+const tabScreenOptions = {
+  tabBarActiveTintColor: colors.black,
+  tabBarInactiveTintColor: colors.zinc[400],
+  headerShown: false,
+  tabBarShowLabel: false,
+  tabBarStyle: {
+    height: 60,
+  },
+};
+
 export default function TabLayout() {
   return (
-    <Tabs
-      screenOptions={{
-        tabBarActiveTintColor: colors.black,
-        tabBarInactiveTintColor: colors.zinc[400],
-        headerShown: false,
-        tabBarShowLabel: false,
-        tabBarStyle: {
-          height: 60,
-        },
-      }}
-    >
+    <Tabs screenOptions={tabScreenOptions}>
       <Tabs.Screen
         name="(home)"
         options={{

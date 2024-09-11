@@ -55,9 +55,10 @@ export default function HomeScreen() {
       refreshControl={
         <RefreshControl refreshing={isFetching} onRefresh={fetchEventList} />
       }
+      showsVerticalScrollIndicator={false}
     >
       <Image source={HeaderImage} className="absolute" />
-      <View className="p-4 pt-16 gap-y-4">
+      <View className="p-4 pt-16 space-y-4">
         <Text className="text-base font-semibold text-white">
           Comissão Permanente do Vestibular
         </Text>

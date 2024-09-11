@@ -1,4 +1,5 @@
 import clsx from "clsx";
+import { Href, router } from "expo-router";
 import { ReactNode } from "react";
 import {
   Text,
@@ -14,14 +15,19 @@ export interface ButtonProps extends ViewProps, TouchableNativeFeedbackProps {
   title: string;
   icon?: ReactNode;
   titleAlign?: TitleAlign;
+  href?: Href;
 }
 
 export function Button(props: ButtonProps) {
-  const { title, icon, titleAlign = "left", ...rest } = props;
+  const { title, icon, titleAlign = "left", href, onPress, ...rest } = props;
+
+  const handleNavigate = () => {
+    router.push(href!);
+  };
 
   return (
     <View {...rest}>
-      <BaseButton {...rest}>
+      <BaseButton onPress={href ? handleNavigate : onPress} {...rest}>
         <View
           className={clsx("p-4 flex-row bg-sky-500 items-center rounded-md", {
             "justify-center": titleAlign === "center",
@@ -29,8 +35,8 @@ export function Button(props: ButtonProps) {
             "justify-end": titleAlign === "right",
           })}
         >
-          {icon && <View className="mr-2">{icon}</View>}
           <Text className="font-semibold text-white">{title}</Text>
+          {icon && <View className="absolute right-0 p-2 mr-2">{icon}</View>}
         </View>
       </BaseButton>
     </View>

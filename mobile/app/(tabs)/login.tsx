@@ -1,54 +1,14 @@
-import { LoginModel, loginSchema } from "@/components/screens/login/validator";
-import { Button } from "@/components/ui/button";
-import { Form } from "@/components/ui/form";
+import { LoginForm } from "@/components/screens/login/login-form";
+import { UserLogged } from "@/components/screens/login/user-logged";
 import { ScreenContainer } from "@/components/ui/screen-container";
 import { useAuth } from "@/contexts/auth/auth-context";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import { Text, View } from "react-native";
 
 export default function LoginScreen() {
-  const { control, handleSubmit } = useForm<LoginModel>({
-    resolver: zodResolver(loginSchema),
-  });
-
-  const { login, token, logout } = useAuth();
-
-  const onSubmit = async (values: LoginModel) => {
-    await login(values);
-  };
+  const { token } = useAuth();
 
   return (
     <ScreenContainer title="Área do Candidato">
-      {token ? (
-        <>
-          <Text>Usuário logado</Text>
-          <Button title="Deslogar" onPress={logout} />
-        </>
-      ) : (
-        <View className="pt-32 gap-y-4">
-          <Form.Input
-            name="cpf"
-            control={control}
-            label="CPF"
-            maskType="cpf"
-            maxLength={14}
-            placeholder="000.000.000-00"
-          />
-          <Form.Input
-            name="password"
-            control={control}
-            label="Senha"
-            placeholder="**********"
-            secureTextEntry={true}
-          />
-          <Form.SubmitButton
-            title="Entrar"
-            titleAlign="center"
-            onPress={handleSubmit(onSubmit)}
-          />
-        </View>
-      )}
+      {token ? <UserLogged /> : <LoginForm />}
     </ScreenContainer>
   );
 }
