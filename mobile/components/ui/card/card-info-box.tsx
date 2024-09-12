@@ -1,12 +1,12 @@
 import { ReactNode } from "react";
 import { Text, View, ViewProps } from "react-native";
 
-interface EventInfoBoxProps extends ViewProps {
+interface CardInfoBoxProps extends ViewProps {
   title: string;
   children: ReactNode;
 }
 
-export function EventInfoBox(props: EventInfoBoxProps) {
+export function CardInfoBox(props: CardInfoBoxProps) {
   const { title, children, ...rest } = props;
 
   return (

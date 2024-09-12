@@ -1,12 +1,12 @@
 import { ReactNode } from "react";
 import { Text } from "react-native";
 
-interface EventInfoTextProps {
+interface CardInfoTextProps {
   children: ReactNode;
   prefix?: string;
 }
 
-export function EventInfoText(props: EventInfoTextProps) {
+export function CardInfoText(props: CardInfoTextProps) {
   const { children, prefix } = props;
 
   return (

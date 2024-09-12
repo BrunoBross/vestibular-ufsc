@@ -1,10 +1,12 @@
 import HeaderImage from "@/assets/images/app/header.png";
-import { EventCard } from "@/components/screens/home/event-card";
+import { EventList } from "@/components/screens/home/event-list";
+import { LoadingContainer } from "@/components/ui/loading";
 import { useAuth } from "@/contexts/auth/auth-context";
 import { axios } from "@/lib/axios";
 import { Feather } from "@expo/vector-icons";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { Image, RefreshControl, ScrollView, Text, View } from "react-native";
+import { useQuery } from "react-query";
 import colors from "tailwindcss/colors";
 
 // tentar pegar a tipagem do backend :D
@@ -26,25 +28,17 @@ export interface Event {
   examList: Exam[];
 }
 
+const fetchEventQuery = (): Promise<Event[]> =>
+  axios.get("/event").then(({ data }) => data.eventList);
+
 export default function HomeScreen() {
   const { token } = useAuth();
-  const [eventList, setEventList] = useState<Event[]>([]);
-  const [isFetching, setIsFetching] = useState(false);
 
-  const fetchEventList = async () => {
-    setIsFetching(true);
-    await axios
-      .get("/event")
-      .then(({ data }) => {
-        setEventList(data.eventList);
-      })
-      .catch((error) => {
-        console.log(error);
-      })
-      .finally(() => {
-        setIsFetching(false);
-      });
-  };
+  const {
+    data: eventList,
+    refetch: fetchEventList,
+    isLoading,
+  } = useQuery("events", fetchEventQuery);
 
   useEffect(() => {
     fetchEventList();
@@ -53,25 +47,24 @@ export default function HomeScreen() {
   return (
     <ScrollView
       refreshControl={
-        <RefreshControl refreshing={isFetching} onRefresh={fetchEventList} />
+        <RefreshControl refreshing={isLoading} onRefresh={fetchEventList} />
       }
       showsVerticalScrollIndicator={false}
+      contentContainerStyle={{ paddingBottom: 64 }}
     >
       <Image source={HeaderImage} className="absolute" />
-      <View className="p-4 pt-16 space-y-4">
+      <View className="h-full p-4 pt-16 space-y-4">
         <Text className="text-base font-semibold text-white">
           Comissão Permanente do Vestibular
         </Text>
 
-        <View className="flex-row items-center gap-x-2">
+        <View className="flex-row items-center space-x-2">
           <Feather name="home" color={colors.white} size={16} />
           <Text className="text-white">•</Text>
           <Text className="text-white">Processos Seletivos</Text>
         </View>
 
-        {eventList.map((event) => (
-          <EventCard key={event.id} event={event} />
-        ))}
+        {isLoading ? <LoadingContainer /> : <EventList eventList={eventList} />}
       </View>
     </ScrollView>
   );

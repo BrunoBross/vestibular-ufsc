@@ -8,7 +8,7 @@ interface EventActionsProps extends ViewProps {}
 
 export function EventActions(props: EventActionsProps) {
   const { ...rest } = props;
-  const { id } = useLocalSearchParams();
+  const { id: eventId } = useLocalSearchParams();
   const [proofModalVisible, setProofModalVisible] = useState(false);
 
   const handleOpenProofModal = () => {
@@ -19,12 +19,12 @@ export function EventActions(props: EventActionsProps) {
     <>
       <Button
         title="Pontuação por Questão"
-        href={`/event/${id}/score-per-question`}
+        href={`/event/${eventId}/score-per-question`}
         {...rest}
       />
       <Button
         title="Boletim de Desempenho Individual"
-        href={`/event/${id}/individual-performance`}
+        href={`/event/${eventId}/individual-performance`}
         {...rest}
       />
       <Button title="Boletim de Desempenho Individual - Reopção" {...rest} />

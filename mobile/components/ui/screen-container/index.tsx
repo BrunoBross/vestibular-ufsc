@@ -1,22 +1,34 @@
 import { Feather } from "@expo/vector-icons";
 import { router } from "expo-router";
+import { ReactNode } from "react";
 import {
+  RefreshControl,
   ScrollView,
   StatusBar,
-  Text,
   TouchableOpacity,
   View,
-  ViewProps,
 } from "react-native";
-import { twMerge } from "tailwind-merge";
+import { ClassNameValue, twMerge } from "tailwind-merge";
+import { ScreenContainerTitle } from "./screen-container-text";
 
-interface ScreenContainerProps extends ViewProps {
-  title?: string;
+interface ScreenContainerProps {
+  title?: string | ReactNode;
   canGoBack?: boolean;
+  isLoading?: boolean;
+  onRefresh?: () => void;
+  className?: ClassNameValue;
+  children?: ReactNode;
 }
 
 export function ScreenContainer(props: ScreenContainerProps) {
-  const { title, canGoBack, className, children, ...rest } = props;
+  const {
+    title,
+    canGoBack,
+    isLoading = false,
+    onRefresh,
+    className,
+    children,
+  } = props;
 
   const handleGoBack = () => {
     router.back();
@@ -33,16 +45,29 @@ export function ScreenContainer(props: ScreenContainerProps) {
             <Feather name="arrow-left" size={22} />
           </TouchableOpacity>
 
-          <Text className="text-base font-bold ">Voltar</Text>
+          <ScreenContainerTitle className="text-base font-bold ">
+            Voltar
+          </ScreenContainerTitle>
         </View>
       )}
 
-      {title && <Text className="text-base font-bold ">{title}</Text>}
+      {title && typeof title === "string" ? (
+        <ScreenContainerTitle className="text-base font-bold ">
+          {title}
+        </ScreenContainerTitle>
+      ) : (
+        title
+      )}
 
       <ScrollView
         className={twMerge("mt-2", className)}
         contentContainerStyle={{ paddingBottom: 64 }}
         showsVerticalScrollIndicator={false}
+        refreshControl={
+          onRefresh && (
+            <RefreshControl refreshing={isLoading} onRefresh={onRefresh} />
+          )
+        }
       >
         {children}
       </ScrollView>

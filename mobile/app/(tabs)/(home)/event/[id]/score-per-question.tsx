@@ -1,12 +1,19 @@
-import { EventInfoBox } from "@/components/screens/home/event/event-info-box";
-import { EventInfoText } from "@/components/screens/home/event/event-info-text";
-import { Badge } from "@/components/ui/badge";
+import { CourseCard } from "@/components/screens/home/event/course-card";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { CardInfoBox } from "@/components/ui/card/card-info-box";
+import { CardInfoText } from "@/components/ui/card/card-info-text";
 import { ScreenContainer } from "@/components/ui/screen-container";
-import { Text } from "react-native";
+import { ScreenContainerTitle } from "@/components/ui/screen-container/screen-container-text";
+import { router, useLocalSearchParams } from "expo-router";
 
 export default function ScorePerQuestionScreen() {
+  const { id: eventId } = useLocalSearchParams();
+
+  const handleNavigateToExamSubjects = () => {
+    router.push(`/event/${eventId}/exam/exam-subjects`);
+  };
+
   return (
     <ScreenContainer
       canGoBack
@@ -14,27 +21,27 @@ export default function ScorePerQuestionScreen() {
       className="space-y-4"
     >
       <Card className="space-y-4">
-        <EventInfoBox title="Candidato">
-          <EventInfoText>Bruno Barreto</EventInfoText>
-        </EventInfoBox>
-        <EventInfoBox title="Número de Inscrição">
-          <EventInfoText>20202020</EventInfoText>
-        </EventInfoBox>
-        <EventInfoBox title="Política de Ações Afirmativas">
-          <EventInfoText>
+        <CardInfoBox title="Candidato">
+          <CardInfoText>Bruno Barreto</CardInfoText>
+        </CardInfoBox>
+        <CardInfoBox title="Número de Inscrição">
+          <CardInfoText>20202020</CardInfoText>
+        </CardInfoBox>
+        <CardInfoBox title="Política de Ações Afirmativas">
+          <CardInfoText>
             222 - Escola Pública - Renda até 1,5 SM - Outros
-          </EventInfoText>
-        </EventInfoBox>
-        <Text className="font-bold text-center">Curso</Text>
-        <EventInfoBox title="Opção 1" className="items-start space-y-2">
-          <EventInfoText>
-            103 - UFSC - MEDICINA - BEL - INTEGRAL - FLORIANÓPOLIS
-          </EventInfoText>
-          <Badge text="Não Classificado" badgeType="danger" />
-        </EventInfoBox>
+          </CardInfoText>
+        </CardInfoBox>
       </Card>
-      <Button title="Prova 1" />
-      <Button title="Prova 2" />
+
+      <ScreenContainerTitle>Curso</ScreenContainerTitle>
+      <CourseCard
+        courseTitle="103 - UFSC - MEDICINA - BEL - INTEGRAL - FLORIANÓPOLIS"
+        classified={false}
+      />
+
+      <Button title="Prova 1" onPress={handleNavigateToExamSubjects} />
+      <Button title="Prova 2" onPress={handleNavigateToExamSubjects} />
     </ScreenContainer>
   );
 }

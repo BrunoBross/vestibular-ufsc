@@ -1,7 +1,7 @@
 import { View, ViewProps } from "react-native";
 import { twMerge } from "tailwind-merge";
 
-interface CardProps extends ViewProps {}
+export interface CardProps extends ViewProps {}
 
 export function Card(props: CardProps) {
   const { className, children, ...rest } = props;
