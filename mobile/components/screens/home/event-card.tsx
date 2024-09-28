@@ -21,7 +21,7 @@ export function EventCard(props: EventCardProps) {
           4898341 - BRUNO BARRETO
         </Text> */}
         <Text className="font-semibold">{event.eventName}</Text>
-        <View className="flex-row items-center gap-x-1">
+        <View className="flex-row items-center gap-x-1 ">
           <Feather name="calendar" color={colors.zinc[500]} size={16} />
           <Text className="font-medium text-zinc-500">Inscrições</Text>
         </View>

@@ -2,6 +2,7 @@ import { FocusManager } from "@/components/focus-manager";
 import { AuthProvider } from "@/contexts/auth/auth-context";
 import { queryCLient } from "@/lib/query-client";
 import { useFonts } from "expo-font";
+import * as Notifications from "expo-notifications";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import ExpoStatusBar from "expo-status-bar/build/ExpoStatusBar";
@@ -11,6 +12,15 @@ import "react-native-reanimated";
 import { QueryClientProvider } from "react-query";
 
 SplashScreen.preventAutoHideAsync();
+
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: true,
+    shouldSetBadge: true,
+    priority: Notifications.AndroidNotificationPriority.MAX,
+  }),
+});
 
 export default function RootLayout() {
   const [loaded] = useFonts({
@@ -22,6 +32,10 @@ export default function RootLayout() {
       SplashScreen.hideAsync();
     }
   }, [loaded]);
+
+  useEffect(() => {
+    Notifications.requestPermissionsAsync();
+  }, []);
 
   if (!loaded) {
     return null;

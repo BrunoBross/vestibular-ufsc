@@ -6,11 +6,14 @@ import { View } from "react-native";
 import { LoginModel, loginSchema } from "./validator";
 
 export function LoginForm() {
+  const { login, isLoading, expoToken } = useAuth();
+
   const { control, handleSubmit } = useForm<LoginModel>({
     resolver: zodResolver(loginSchema),
+    defaultValues: {
+      expoToken,
+    },
   });
-
-  const { login } = useAuth();
 
   const onSubmit = async (values: LoginModel) => {
     await login(values);
@@ -37,6 +40,7 @@ export function LoginForm() {
         title="Entrar"
         titleAlign="center"
         onPress={handleSubmit(onSubmit)}
+        isLoading={isLoading}
       />
     </View>
   );

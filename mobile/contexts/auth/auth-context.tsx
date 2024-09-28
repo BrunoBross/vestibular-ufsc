@@ -1,14 +1,17 @@
 import { LoginModel } from "@/components/screens/login/validator";
 import { axios } from "@/lib/axios";
+import * as Notifications from "expo-notifications";
 import { createContext, ReactNode, useContext, useEffect } from "react";
 import { useMutation } from "react-query";
 import { useAuthStore } from "./auth-storage";
 
 interface AuthContextType {
   token?: string;
+  cpf?: string;
   login: (values: LoginModel) => Promise<void>;
   logout: () => void;
   isLoading: boolean;
+  expoToken?: string;
 }
 
 interface AuthProviderProps {
@@ -20,7 +23,8 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider(props: AuthProviderProps) {
   const { children } = props;
 
-  const { token, setToken, clearToken } = useAuthStore();
+  const { token, setToken, expoToken, setExpoToken, cpf, setCpf } =
+    useAuthStore();
 
   const { mutateAsync: loginAsync, isLoading } = useMutation(
     (values: LoginModel) => axios.post("/login", values)
@@ -29,12 +33,26 @@ export function AuthProvider(props: AuthProviderProps) {
   const login = async (values: LoginModel) => {
     loginAsync(values).then(({ data }) => {
       setToken(data.token);
+      setCpf(values.cpf);
     });
   };
 
   const logout = () => {
-    clearToken();
+    setToken(undefined);
+    setCpf(undefined);
   };
+
+  const getExpoToken = async () => {
+    const expoToken = await Notifications.getExpoPushTokenAsync({
+      projectId: "7c553dc8-252c-4430-b01d-3297c2e5030f",
+    });
+
+    expoToken && setExpoToken(expoToken.data);
+  };
+
+  useEffect(() => {
+    getExpoToken();
+  }, []);
 
   useEffect(() => {
     if (token) {
@@ -45,7 +63,9 @@ export function AuthProvider(props: AuthProviderProps) {
   }, [token]);
 
   return (
-    <AuthContext.Provider value={{ token, login, logout, isLoading }}>
+    <AuthContext.Provider
+      value={{ token, login, logout, isLoading, expoToken, cpf }}
+    >
       {children}
     </AuthContext.Provider>
   );
