@@ -3,11 +3,16 @@ import { fastify } from "@/lib/fastify";
 import "dotenv/config";
 import { routes } from "./routes";
 
+import Cors from "@fastify/cors";
 import {
   serializerCompiler,
   validatorCompiler,
 } from "fastify-type-provider-zod";
 import { errorHandler } from "./error-handler";
+
+fastify.register(Cors, {
+  origin: true,
+});
 
 registerAuth(fastify);
 
