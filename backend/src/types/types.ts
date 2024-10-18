@@ -15,4 +15,5 @@ interface RawEvent {
   corrente: boolean;
   modalidade_provas: string | null;
   provas: RawExam[];
+  imagem: string;
 }

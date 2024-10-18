@@ -26,6 +26,7 @@ export interface Event {
   coursesAmount: number;
   modalities: string;
   examList: Exam[];
+  image: string;
 }
 
 const fetchEventQuery = (): Promise<Event[]> =>

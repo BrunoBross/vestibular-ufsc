@@ -10,7 +10,7 @@ import { axios } from "@/lib/axios";
 import { Feather } from "@expo/vector-icons";
 import { openURL } from "expo-linking";
 import { useLocalSearchParams } from "expo-router";
-import { Text } from "react-native";
+import { Image, Text, View } from "react-native";
 import { useQuery } from "react-query";
 import colors from "tailwindcss/colors";
 
@@ -57,10 +57,16 @@ export default function EventDetailsScreen() {
       onRefresh={fetchEvent}
       className="space-y-4"
     >
-      <Card className="items-start space-y-2">
-        <Text className="font-bold">{event.eventName}</Text>
-        <Badge text="Incrição não realizada" badgeType="danger" />
-        <Badge text="Período de inscrição encerrado" badgeType="danger" />
+      <Card className="flex-row space-x-2">
+        <View className="flex-[3] space-y-2">
+          <Text className="font-bold">{event.eventName}</Text>
+          <Badge text="Incrição não realizada" badgeType="danger" />
+          <Badge text="Período de inscrição encerrado" badgeType="danger" />
+        </View>
+        <Image
+          className="flex-1 rounded-md aspect-square"
+          source={{ uri: event.image }}
+        />
       </Card>
 
       <EventActions />
