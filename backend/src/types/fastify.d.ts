@@ -9,7 +9,7 @@ declare module "fastify" {
     authenticate: (
       request: FastifyRequest,
       reply: FastifyReply,
-      done: (err?: Error | null, user?: User) => void
+      done?: (err?: Error | null, user?: User) => void
     ) => Promise<void>;
   }
 }

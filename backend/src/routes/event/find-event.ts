@@ -9,19 +9,28 @@ const findEventParamsSchema = z.object({
 });
 
 export const findEvent = async (fastify: FastifyInstance) => {
-  fastify
-    .withTypeProvider<ZodTypeProvider>()
-    .get(
-      "/event/:id",
-      { schema: { params: findEventParamsSchema } },
-      async (request, reply) => {
-        const event = await findEventById(request.params.id);
+  fastify.withTypeProvider<ZodTypeProvider>().get(
+    "/event/:id",
+    {
+      schema: { params: findEventParamsSchema },
+    },
+    async (request, reply) => {
+      let userToken = "";
 
-        if (!event) {
-          throw new ClientError("Event not found");
-        }
+      await fastify
+        .authenticate(request, reply)
+        .then(() => (userToken = request.user.userToken));
 
-        reply.send({ event });
+      const event = await findEventById(
+        request.params.id,
+        request.user?.userToken
+      );
+
+      if (!event) {
+        throw new ClientError("Event not found");
       }
-    );
+
+      reply.send({ event });
+    }
+  );
 };

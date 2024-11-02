@@ -17,3 +17,34 @@ interface RawEvent {
   provas: RawExam[];
   imagem: string;
 }
+
+interface RawOption {
+  curso: {
+    nome: string;
+    campus: string;
+  };
+  opcao: string;
+  indicador: string;
+}
+
+interface RawResult {
+  classificado?: {
+    opcao: RawOption;
+    ordem: number;
+    categoria: string;
+    periodo: string;
+  };
+  espera: RawOption[];
+}
+
+interface RawCandidateEvent {
+  codigo_evento: number;
+  evento: string;
+  inscricao: string;
+  nome: string;
+  paa: boolean;
+  paa_pcd: boolean;
+  paa_ppi: boolean;
+  paa_baixa_renda: boolean;
+  paa_quilombola: boolean;
+}

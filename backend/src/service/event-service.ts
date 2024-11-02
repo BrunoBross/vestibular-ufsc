@@ -8,6 +8,37 @@ export interface Exam {
   examEndDate: Date;
 }
 
+export enum PAA {
+  NONE,
+  PWD,
+  PPI,
+  LOW_INCOME,
+  QUILOMBOLA,
+}
+
+export interface Option {
+  name: string;
+  campus: string;
+  classified: boolean;
+  option: string;
+}
+
+export interface Candidate {
+  name: string;
+  registrationCode: string;
+  paa: PAA;
+}
+
+export interface Result {
+  classified: {
+    option: Option;
+    order: number;
+    category: string;
+    period: string;
+  };
+  waitList: Option[];
+}
+
 export interface Event {
   id: number;
   eventName: string;
@@ -18,6 +49,9 @@ export interface Event {
   modalities: string;
   examList: Exam[];
   image: string;
+  candidate?: Candidate;
+  options?: Option[];
+  result?: Result;
 }
 
 export const getEventList = async () => {
@@ -31,32 +65,64 @@ export const getEventList = async () => {
     });
 
   const parsedEventList: Event[] = eventList.map((rawEvent: RawEvent) => {
-    return parseEvent(rawEvent);
+    return parseEvent({ rawEvent });
   });
-
-  // const filteredEventList = parsedEventList.filter((event) =>
-  //   isAfter(event.registrationEndDate, new Date())
-  // );
 
   return parsedEventList;
 };
 
-export const findEventById = async (id: number) => {
-  const event = await axios
+export const findEventById = async (id: number, token?: string) => {
+  const rawOptions = token
+    ? await axios
+        .get(`/api/private/v1/evento/${id}/candidato/opcoes`, {
+          ...buildBearerToken(token),
+        })
+        .then(({ data }) => data)
+        .catch((error) => {
+          console.log(error);
+        })
+    : null;
+
+  const rawResult = token
+    ? await axios
+        .get(`/api/private/v1/evento/${id}/candidato/resultado`, {
+          ...buildBearerToken(token),
+        })
+        .then(({ data }) => data)
+        .catch((error) => {
+          console.log(error);
+        })
+    : null;
+
+  const rawEventCandidate = token
+    ? await axios
+        .get(`/api/private/v1/evento/${id}/candidato`, {
+          ...buildBearerToken(token),
+        })
+        .then(({ data }) => data.candidato)
+        .catch((error) => {
+          console.log(error);
+        })
+    : null;
+
+  const rawEvent = await axios
     .get(`/api/v1/evento/${id}`)
-    .then(({ data }) => {
-      return parseEvent(data.evento);
-    })
+    .then(({ data }) => data.evento)
     .catch((error) => {
       console.log(error);
     });
 
-  return event;
+  const parsedEvent = parseEvent({
+    rawEvent,
+    rawEventCandidate,
+    rawOptions,
+    rawResult,
+  });
+
+  return parsedEvent;
 };
 
 export const getCandidateEventList = async (token: string) => {
-  const eventList = await getEventList();
-
   const candidateEventList = await axios
     .get("/api/private/v1/candidatos", { ...buildBearerToken(token) })
     .then(({ data }) => {
