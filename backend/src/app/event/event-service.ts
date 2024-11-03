@@ -1,58 +1,7 @@
+import { ClientError } from "@/errors/client-error";
 import { axios } from "@/lib/axios";
 import { buildBearerToken } from "@/utils/build-bearer-token";
-import { parseEvent } from "@/utils/parse-event";
-
-export interface Exam {
-  description: string;
-  examStartDate: Date;
-  examEndDate: Date;
-}
-
-export enum PAA {
-  NONE,
-  PWD,
-  PPI,
-  LOW_INCOME,
-  QUILOMBOLA,
-}
-
-export interface Option {
-  name: string;
-  campus: string;
-  classified: boolean;
-  option: string;
-}
-
-export interface Candidate {
-  name: string;
-  registrationCode: string;
-  paa: PAA;
-}
-
-export interface Result {
-  classified: {
-    option: Option;
-    order: number;
-    category: string;
-    period: string;
-  };
-  waitList: Option[];
-}
-
-export interface Event {
-  id: number;
-  eventName: string;
-  registrationCost: number;
-  registrationStartDate: Date;
-  registrationEndDate: Date;
-  coursesAmount: number;
-  modalities: string;
-  examList: Exam[];
-  image: string;
-  candidate?: Candidate;
-  options?: Option[];
-  result?: Result;
-}
+import { parseEvent } from "./event-utils";
 
 export const getEventList = async () => {
   const eventList = await axios
@@ -64,14 +13,28 @@ export const getEventList = async () => {
       console.log(error);
     });
 
-  const parsedEventList: Event[] = eventList.map((rawEvent: RawEvent) => {
-    return parseEvent({ rawEvent });
-  });
+  const parsedEventList: Event[] = eventList.map((rawEvent: RawEvent) =>
+    parseEvent({ rawEvent })
+  );
 
-  return parsedEventList;
+  return parsedEventList.reverse();
 };
 
 export const findEventById = async (id: number, token?: string) => {
+  const rawEvent = await axios
+    .get(`/api/v1/evento/${id}`)
+    .then(({ data }) => data.evento)
+    .catch((error) => {
+      console.log(error);
+      throw new ClientError("Event not found");
+    });
+
+  if (!token) {
+    return parseEvent({
+      rawEvent,
+    });
+  }
+
   const rawOptions = token
     ? await axios
         .get(`/api/private/v1/evento/${id}/candidato/opcoes`, {
@@ -105,21 +68,12 @@ export const findEventById = async (id: number, token?: string) => {
         })
     : null;
 
-  const rawEvent = await axios
-    .get(`/api/v1/evento/${id}`)
-    .then(({ data }) => data.evento)
-    .catch((error) => {
-      console.log(error);
-    });
-
-  const parsedEvent = parseEvent({
+  return parseEvent({
     rawEvent,
     rawEventCandidate,
     rawOptions,
     rawResult,
   });
-
-  return parsedEvent;
 };
 
 export const getCandidateEventList = async (token: string) => {

@@ -1,4 +1,4 @@
-import { sendNotificationToDevice } from "@/service/notification-service";
+import { sendNotificationToDevice } from "@/app/notification/notification-service";
 import { FastifyInstance } from "fastify";
 import { ZodTypeProvider } from "fastify-type-provider-zod";
 import { z } from "zod";

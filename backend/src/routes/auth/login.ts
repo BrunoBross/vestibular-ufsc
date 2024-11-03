@@ -1,4 +1,4 @@
-import { loginUser } from "@/service/auth-service";
+import { loginUser } from "@/app/auth/auth-service";
 import { FastifyInstance } from "fastify";
 import { ZodTypeProvider } from "fastify-type-provider-zod";
 import { z } from "zod";

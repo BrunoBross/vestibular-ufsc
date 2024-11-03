@@ -1,4 +1,4 @@
-import { getUserNotificationsByCpf } from "@/service/notification-service";
+import { getUserNotificationsByCpf } from "@/app/notification/notification-service";
 import { FastifyInstance } from "fastify";
 import { ZodTypeProvider } from "fastify-type-provider-zod";
 import { z } from "zod";

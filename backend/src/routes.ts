@@ -1,7 +1,7 @@
 import { FastifyInstance } from "fastify";
-import { authRoutes } from "./auth";
-import { eventRoutes } from "./event";
-import { notificationRoutes } from "./notification";
+import { eventRoutes } from "./app/event/event-routes";
+import { authRoutes } from "./routes/auth";
+import { notificationRoutes } from "./routes/notification";
 
 export const routes = async (fastify: FastifyInstance) => {
   fastify.get("/", (_, reply) => {
