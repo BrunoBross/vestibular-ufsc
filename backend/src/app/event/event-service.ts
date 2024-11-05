@@ -1,53 +1,38 @@
 import { Event, EventCandidate } from "../../types/event/event-types";
 import {
   findRawEventById,
-  getRawCandidateEventList,
   getRawEventCandidate,
   getRawEventList,
   getRawExamLocation,
   getRawOptions,
   getRawResults,
 } from "./event-requests";
-import { parseEvent, parseEventCandidate } from "./event-utils";
+import {
+  parseBasicEvent,
+  parseEvent,
+  parseEventCandidate,
+} from "./event-utils";
 
-export const getEventList = async () => {
+export const getEventList = async (
+  token: string
+): Promise<EventCandidate[]> => {
   const rawEventList = await getRawEventList();
 
   const parsedEventList = await Promise.all(
-    rawEventList.map((rawEvent: RawEvent) => parseEvent({ rawEvent }))
-  );
+    rawEventList.map(async (rawEvent: RawEvent) => {
+      const rawEventCandidate = await getRawEventCandidate(
+        rawEvent.codigo_evento,
+        token
+      );
 
-  return parsedEventList.reverse();
-};
-
-export const getEventCandidateList = async (
-  token: string
-): Promise<EventCandidate[]> => {
-  const rawEventCandidateList = await getRawCandidateEventList(token);
-
-  const parsedCandidateEventList = await Promise.all(
-    rawEventCandidateList.map(async (rawEventCandidate: RawEventCandidate) => {
-      const eventId = rawEventCandidate.codigo_evento;
-
-      const [rawEvent, rawExamLocation, rawOptions, rawResult] =
-        await Promise.all([
-          findRawEventById(eventId),
-          getRawExamLocation(eventId, token),
-          getRawOptions(eventId, token),
-          getRawResults(eventId, token),
-        ]);
-
-      return await parseEventCandidate({
-        rawEventCandidate,
+      return await parseBasicEvent({
         rawEvent,
-        rawExamLocation,
-        rawOptions,
-        rawResult,
+        rawEventCandidate,
       });
     })
   );
 
-  return parsedCandidateEventList.reverse();
+  return parsedEventList.reverse();
 };
 
 export const findEventById = async (

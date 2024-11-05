@@ -1,18 +1,18 @@
 import { ReactNode } from "react";
-import { Text } from "react-native";
+import { Text, TextProps } from "react-native";
 
-interface CardInfoTextProps {
+interface CardInfoTextProps extends TextProps {
   children: ReactNode;
   prefix?: string;
 }
 
 export function CardInfoText(props: CardInfoTextProps) {
-  const { children, prefix } = props;
+  const { children, prefix, ...rest } = props;
 
   return (
-    <Text>
+    <Text {...rest}>
       {prefix && <Text className="font-bold">{prefix} </Text>}
-      {children}
+      {children || "-"}
     </Text>
   );
 }

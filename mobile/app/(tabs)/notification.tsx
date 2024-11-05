@@ -2,7 +2,7 @@ import { NotificationItem } from "@/components/screens/notification/notification
 import { ScreenContainer } from "@/components/ui/screen-container";
 import { useAuth } from "@/contexts/auth/auth-context";
 import { axios } from "@/lib/axios";
-import { View } from "react-native";
+import { Text, View } from "react-native";
 import { useQuery } from "react-query";
 
 export interface Notification {
@@ -24,9 +24,13 @@ export default function NotificationScreen() {
   return (
     <ScreenContainer title="Notificações">
       <View className="space-y-4">
-        {notifications?.map((notification, index) => (
-          <NotificationItem key={index} notification={notification} />
-        ))}
+        {notifications && notifications?.length > 0 ? (
+          notifications?.map((notification, index) => (
+            <NotificationItem key={index} notification={notification} />
+          ))
+        ) : (
+          <Text>Não há notificações no momento</Text>
+        )}
       </View>
     </ScreenContainer>
   );

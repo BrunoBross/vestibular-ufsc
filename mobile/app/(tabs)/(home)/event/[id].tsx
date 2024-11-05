@@ -1,6 +1,10 @@
 import { Event } from "@/app/(tabs)/(home)/index";
+import { CandidateDetailsInfo } from "@/components/screens/home/event/candidate-details-info";
 import { EventActions } from "@/components/screens/home/event/event-actions";
 import { EventDetailsInfo } from "@/components/screens/home/event/event-details-info";
+import { EventOptionsInfo } from "@/components/screens/home/event/event-options-info";
+import { EventResultsInfo } from "@/components/screens/home/event/event-results-info";
+import { ExamLocationInfo } from "@/components/screens/home/event/exam-location-info";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -8,6 +12,7 @@ import { LoadingContainer } from "@/components/ui/loading";
 import { ScreenContainer } from "@/components/ui/screen-container";
 import { axios } from "@/lib/axios";
 import { Feather } from "@expo/vector-icons";
+import { isAfter } from "date-fns";
 import { openURL } from "expo-linking";
 import { useLocalSearchParams } from "expo-router";
 import { Image, Text, View } from "react-native";
@@ -60,8 +65,28 @@ export default function EventDetailsScreen() {
       <Card className="flex-row space-x-2">
         <View className="flex-[3] space-y-2">
           <Text className="font-bold">{event.eventName}</Text>
-          <Badge text="Incrição não realizada" badgeType="danger" />
-          <Badge text="Período de inscrição encerrado" badgeType="danger" />
+          {!event.candidate ? (
+            <View className="items-start space-y-2">
+              <Badge text="Incrição não realizada" badgeType="danger" />
+              {isAfter(new Date(), event.registrationEndDate) && (
+                <Badge
+                  text="Período de inscrição encerrado"
+                  badgeType="danger"
+                />
+              )}
+            </View>
+          ) : (
+            <View className="items-start space-y-2">
+              {event.candidate.registrationPaid ? (
+                <Badge text="Incrição efetivada" badgeType="success" />
+              ) : (
+                <Badge
+                  text="Incrição não efetivada por falta de pagamento"
+                  badgeType="danger"
+                />
+              )}
+            </View>
+          )}
         </View>
         <Image
           className="flex-1 rounded-md aspect-square"
@@ -69,16 +94,30 @@ export default function EventDetailsScreen() {
         />
       </Card>
 
+      {event.candidate && (
+        <View className="space-y-4">
+          <CandidateDetailsInfo candidate={event.candidate} />
+          {event.result ? (
+            <EventResultsInfo result={event.result} />
+          ) : (
+            <ExamLocationInfo examLocation={event.examLocation} />
+          )}
+          <EventOptionsInfo optionList={event.options} />
+        </View>
+      )}
+
+      {!event.examLocation && <EventDetailsInfo event={event} />}
+
       <EventActions />
 
-      <EventDetailsInfo event={event} />
-
-      <Button
-        title="Inscrição"
-        titleAlign="center"
-        icon={<Feather name="edit" color={colors.white} size={18} />}
-        onPress={handleEventSubscribe}
-      />
+      {!event.candidate && (
+        <Button
+          title="Inscrição"
+          titleAlign="center"
+          icon={<Feather name="edit" color={colors.white} size={18} />}
+          onPress={handleEventSubscribe}
+        />
+      )}
     </ScreenContainer>
   );
 }

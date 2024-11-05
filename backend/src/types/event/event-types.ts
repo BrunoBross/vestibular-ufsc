@@ -11,13 +11,6 @@ export interface ExamLocation {
   order: number;
 }
 
-export enum PAA {
-  PCD = "PESSOA_COM_DEFICIENCIA",
-  PPI = "PRETO_PARDO_INDIGENA",
-  LOW_INCOME = "BAIXA_RENDA",
-  QUILOMBOLA = "QUILOMBOLA",
-}
-
 export interface Option {
   name: string;
   campus: string;
@@ -29,7 +22,7 @@ export interface Candidate {
   name: string;
   registrationCode: string;
   registrationPaid: boolean;
-  paa: PAA;
+  paa: string;
 }
 
 export interface Wait {
@@ -61,4 +54,15 @@ export interface EventCandidate extends Event {
   candidate: Candidate;
   options: Option[];
   result: Result;
+}
+
+export interface BasicEvent {
+  id: number;
+  eventName: string;
+  registrationStartDate: Date;
+  registrationEndDate: Date;
+  examList: Exam[];
+  registered: boolean;
+  registrationPaid: boolean;
+  image: string;
 }

@@ -16,6 +16,39 @@ export interface Exam {
   examEndDate: Date;
 }
 
+export interface ExamLocation {
+  location: string;
+  section: string;
+  group: string;
+  order: number;
+}
+
+export interface Option {
+  name: string;
+  campus: string;
+  classified: boolean;
+  option: number;
+}
+
+export interface Candidate {
+  name: string;
+  registrationCode: string;
+  registrationPaid: boolean;
+  paa: string;
+}
+
+export interface Wait {
+  option: Option;
+  order: number;
+  category: string;
+  period: string;
+}
+
+export interface Result {
+  classified: Wait;
+  waitList: Wait[];
+}
+
 // tentar pegar a tipagem do backend :D
 export interface Event {
   id: number;
@@ -25,11 +58,26 @@ export interface Event {
   registrationEndDate: Date;
   coursesAmount: number;
   modalities: string;
+  image: string;
   examList: Exam[];
+  examLocation?: ExamLocation;
+  candidate?: Candidate;
+  options?: Option[];
+  result?: Result;
+}
+
+export interface BasicEvent {
+  id: number;
+  eventName: string;
+  registrationStartDate: Date;
+  registrationEndDate: Date;
+  examList: Exam[];
+  registered: boolean;
+  registrationPaid: boolean;
   image: string;
 }
 
-const fetchEventQuery = (): Promise<Event[]> =>
+const fetchEventQuery = (): Promise<BasicEvent[]> =>
   axios.get("/event").then(({ data }) => data.eventList);
 
 export default function HomeScreen() {

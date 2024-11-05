@@ -1,9 +1,9 @@
-import { Event } from "@/app/(tabs)/(home)";
+import { BasicEvent } from "@/app/(tabs)/(home)";
 import { Text, View, ViewProps } from "react-native";
 import { EventCard } from "./event-card";
 
 interface EventListProps extends ViewProps {
-  eventList?: Event[];
+  eventList?: BasicEvent[];
 }
 
 export function EventList(props: EventListProps) {

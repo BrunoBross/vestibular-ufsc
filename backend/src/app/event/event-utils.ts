@@ -1,12 +1,12 @@
 import { convertStringToDate } from "@/utils/format-date";
 import {
+  BasicEvent,
   Candidate,
   Event,
   EventCandidate,
   Exam,
   ExamLocation,
   Option,
-  PAA,
   Result,
   Wait,
 } from "../../types/event/event-types";
@@ -22,6 +22,11 @@ interface ParseEventCandidateProps extends ParseEventProps {
   rawResult: RawResult;
 }
 
+interface ParseBasicEventProps {
+  rawEvent: RawEvent;
+  rawEventCandidate?: RawEventCandidate;
+}
+
 export const parseEvent = ({ rawEvent }: ParseEventProps): Promise<Event> => {
   return Promise.resolve({
     id: rawEvent.codigo_evento,
@@ -33,6 +38,22 @@ export const parseEvent = ({ rawEvent }: ParseEventProps): Promise<Event> => {
     registrationEndDate: convertStringToDate(rawEvent.data_fim_inscricao),
     image: rawEvent.imagem,
     examList: parseExamList(rawEvent.provas),
+  });
+};
+
+export const parseBasicEvent = async ({
+  rawEvent,
+  rawEventCandidate,
+}: ParseBasicEventProps): Promise<BasicEvent> => {
+  return Promise.resolve({
+    id: rawEvent.codigo_evento,
+    eventName: rawEvent.nome,
+    registrationStartDate: convertStringToDate(rawEvent.data_inicio_inscricao),
+    registrationEndDate: convertStringToDate(rawEvent.data_fim_inscricao),
+    examList: parseExamList(rawEvent.provas),
+    registered: !!rawEventCandidate,
+    registrationPaid: !!rawEventCandidate,
+    image: rawEvent.imagem,
   });
 };
 
@@ -113,7 +134,9 @@ const parseOption = (rawOption: RawOption): Promise<Option | null> => {
   return Promise.resolve({
     campus: rawOption.curso.campus,
     name: rawOption.curso.nome,
-    classified: rawOption.indicador === "Classificado",
+    classified: rawOption.indicador
+      ? rawOption.indicador === "Classificado"
+      : null,
     option: Number(rawOption.opcao),
   });
 };
@@ -131,31 +154,50 @@ const parseCandidate = (
     return null;
   }
 
-  const {
-    nome,
-    inscricao,
-    paa,
-    paa_baixa_renda,
-    paa_pcd,
-    paa_ppi,
-    paa_quilombola,
-  } = rawEventCandidate;
+  const { nome, inscricao, paa, paa_baixa_renda, paa_pcd, paa_ppi } =
+    rawEventCandidate;
 
-  const enumeredPaa = paa
-    ? paa_baixa_renda
-      ? PAA.LOW_INCOME
-      : paa_pcd
-      ? PAA.PCD
-      : paa_ppi
-      ? PAA.PPI
-      : paa_quilombola && PAA.QUILOMBOLA
-    : null;
+  const getFormatedPaa = () => {
+    if (!paa) {
+      return "Classificação Geral";
+    }
+
+    if (paa_baixa_renda) {
+      if (paa_baixa_renda && paa_ppi && paa_pcd) {
+        return "PAA – Escola Pública – Renda até 1,5 Sal. Mínimos – PPI (Pretos, Pardos e Indígenas) – PCD (Pessoas com Deficiência)";
+      }
+
+      if (paa_ppi) {
+        return "PAA – Escola Pública – Renda até 1,5 Sal. Mínimos – PPI (Pretos, Pardos e Indígenas)";
+      }
+
+      if (paa_pcd) {
+        return "PAA – Escola Pública – Renda até 1,5 Sal. Mínimos – Outros – PCD (Pessoas com Deficiência)";
+      }
+
+      return "PAA – Escola Pública – Renda até 1,5 Sal. Mínimos – Outros";
+    }
+
+    if (paa_baixa_renda && paa_ppi && paa_pcd) {
+      return "PAA – Escola Pública – Renda acima de 1,5 Sal. Mínimos – PPI (Pretos, Pardos e Indígenas) – PCD (Pessoas com Deficiência)";
+    }
+
+    if (paa_ppi) {
+      return "PAA – Escola Pública – Renda acima de 1,5 Sal. Mínimos – PPI (Pretos, Pardos e Indígenas)";
+    }
+
+    if (paa_pcd) {
+      return "PAA – Escola Pública – Renda acima de 1,5 Sal. Mínimos – Outros – PCD (Pessoas com Deficiência)";
+    }
+
+    return "PAA – Escola Pública – Renda acima de 1,5 Sal. Mínimos – Outros";
+  };
 
   return Promise.resolve({
     name: nome,
     registrationCode: inscricao,
     registrationPaid: true,
-    paa: enumeredPaa,
+    paa: getFormatedPaa(),
   });
 };
 

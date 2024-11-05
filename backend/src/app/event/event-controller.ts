@@ -2,11 +2,7 @@ import { FastifyInstance } from "fastify";
 import { ZodTypeProvider } from "fastify-type-provider-zod";
 import { z } from "zod";
 import { getIsUserAuthenticated } from "../auth/auth-utils";
-import {
-  findEventById,
-  getEventCandidateList,
-  getEventList,
-} from "./event-service";
+import { findEventById, getEventList } from "./event-service";
 
 const findEventParamsSchema = z.object({
   id: z.coerce.number(),
@@ -28,24 +24,14 @@ export const findEvent = async (fastify: FastifyInstance) => {
   );
 };
 
-export const getCandidateEvents = async (fastify: FastifyInstance) => {
+export const getEvents = async (fastify: FastifyInstance) => {
   fastify.get(
-    "/event/candidate",
+    "/event",
     { onRequest: [fastify.authenticate] },
     async (request, reply) => {
-      const eventCandidateList = await getEventCandidateList(
-        request.user.userToken
-      );
+      const eventList = await getEventList(request.user.userToken);
 
-      reply.send({ eventCandidateList });
+      reply.send({ eventList });
     }
   );
-};
-
-export const getEvents = async (fastify: FastifyInstance) => {
-  fastify.get("/event", async (request, reply) => {
-    const eventList = await getEventList();
-
-    reply.send({ eventList });
-  });
 };

@@ -12,6 +12,6 @@ export const CPF = STRING.length(14, {
   message: INVALID_ERROR,
 }).transform((cpf) => cpf.replace(/\D/g, ""));
 
-export const PASSWORD = STRING.min(6, {
-  message: "Deve possuir ao menos 6 caracteres",
+export const PASSWORD = STRING.min(1, {
+  message: "Deve possuir ao menos 1 caracteres",
 });
