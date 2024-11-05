@@ -1,90 +1,88 @@
-import { ClientError } from "@/errors/client-error";
-import { axios } from "@/lib/axios";
-import { buildBearerToken } from "@/utils/build-bearer-token";
-import { parseEvent } from "./event-utils";
+import { Event, EventCandidate } from "../../types/event/event-types";
+import {
+  findRawEventById,
+  getRawCandidateEventList,
+  getRawEventCandidate,
+  getRawEventList,
+  getRawExamLocation,
+  getRawOptions,
+  getRawResults,
+} from "./event-requests";
+import { parseEvent, parseEventCandidate } from "./event-utils";
 
 export const getEventList = async () => {
-  const eventList = await axios
-    .get("/api/v1/eventos")
-    .then(({ data }) => {
-      return data.eventos;
-    })
-    .catch((error) => {
-      console.log(error);
-    });
+  const rawEventList = await getRawEventList();
 
-  const parsedEventList: Event[] = eventList.map((rawEvent: RawEvent) =>
-    parseEvent({ rawEvent })
+  const parsedEventList = await Promise.all(
+    rawEventList.map((rawEvent: RawEvent) => parseEvent({ rawEvent }))
   );
 
   return parsedEventList.reverse();
 };
 
-export const findEventById = async (id: number, token?: string) => {
-  const rawEvent = await axios
-    .get(`/api/v1/evento/${id}`)
-    .then(({ data }) => data.evento)
-    .catch((error) => {
-      console.log(error);
-      throw new ClientError("Event not found");
-    });
+export const getEventCandidateList = async (
+  token: string
+): Promise<EventCandidate[]> => {
+  const rawEventCandidateList = await getRawCandidateEventList(token);
+
+  const parsedCandidateEventList = await Promise.all(
+    rawEventCandidateList.map(async (rawEventCandidate: RawEventCandidate) => {
+      const eventId = rawEventCandidate.codigo_evento;
+
+      const [rawEvent, rawExamLocation, rawOptions, rawResult] =
+        await Promise.all([
+          findRawEventById(eventId),
+          getRawExamLocation(eventId, token),
+          getRawOptions(eventId, token),
+          getRawResults(eventId, token),
+        ]);
+
+      return await parseEventCandidate({
+        rawEventCandidate,
+        rawEvent,
+        rawExamLocation,
+        rawOptions,
+        rawResult,
+      });
+    })
+  );
+
+  return parsedCandidateEventList.reverse();
+};
+
+export const findEventById = async (
+  id: number,
+  token?: string
+): Promise<Event | EventCandidate> => {
+  const rawEvent = await findRawEventById(id);
 
   if (!token) {
-    return parseEvent({
+    return await parseEvent({
       rawEvent,
     });
   }
 
-  const rawOptions = token
-    ? await axios
-        .get(`/api/private/v1/evento/${id}/candidato/opcoes`, {
-          ...buildBearerToken(token),
-        })
-        .then(({ data }) => data)
-        .catch((error) => {
-          console.log(error);
-        })
-    : null;
+  const rawEventCandidate = await getRawEventCandidate(id, token);
 
-  const rawResult = token
-    ? await axios
-        .get(`/api/private/v1/evento/${id}/candidato/resultado`, {
-          ...buildBearerToken(token),
-        })
-        .then(({ data }) => data)
-        .catch((error) => {
-          console.log(error);
-        })
-    : null;
+  if (!rawEventCandidate) {
+    return await parseEvent({
+      rawEvent,
+    });
+  }
 
-  const rawEventCandidate = token
-    ? await axios
-        .get(`/api/private/v1/evento/${id}/candidato`, {
-          ...buildBearerToken(token),
-        })
-        .then(({ data }) => data.candidato)
-        .catch((error) => {
-          console.log(error);
-        })
-    : null;
+  const [rawExamLocation, rawOptions, rawResult] = await Promise.all([
+    getRawExamLocation(id, token),
+    getRawOptions(id, token),
+    getRawResults(id, token),
+  ]);
 
-  return parseEvent({
+  const eventCandidate = await parseEventCandidate({
     rawEvent,
     rawEventCandidate,
+    rawExamLocation,
     rawOptions,
     rawResult,
   });
-};
 
-export const getCandidateEventList = async (token: string) => {
-  const candidateEventList = await axios
-    .get("/api/private/v1/candidatos", { ...buildBearerToken(token) })
-    .then(({ data }) => {
-      return data?.candidatos;
-    })
-    .catch((error) => {
-      console.log(error);
-    });
-
-  return candidateEventList;
+  return eventCandidate;
 };

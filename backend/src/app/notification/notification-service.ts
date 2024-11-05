@@ -1,11 +1,13 @@
 import { ClientError } from "@/errors/client-error";
 import { expo } from "@/lib/expo";
 import { prisma } from "@/lib/prisma";
-import { NotificationType } from "@/routes/notification/send-notification";
 import { User } from "@prisma/client";
 import { ExpoPushMessage } from "expo-server-sdk";
+import { NotificationType } from "./notification-controller";
 
-export async function sendNotificationToDevice(notification: NotificationType) {
+export const sendNotificationToDevice = async (
+  notification: NotificationType
+) => {
   const userList = await prisma.user.findMany();
 
   const messages: ExpoPushMessage[] = userList.map((user) => {
@@ -28,12 +30,12 @@ export async function sendNotificationToDevice(notification: NotificationType) {
   });
 
   await addNotificationToUsers(notification, userList);
-}
+};
 
-async function addNotificationToUsers(
+const addNotificationToUsers = async (
   notification: NotificationType,
   userList: User[]
-) {
+) => {
   userList.map(async (user) => {
     await prisma.notification.create({
       data: {
@@ -43,9 +45,9 @@ async function addNotificationToUsers(
       },
     });
   });
-}
+};
 
-export async function getUserNotificationsByCpf(cpf: string) {
+export const getUserNotificationsByCpf = async (cpf: string) => {
   const user = await prisma.user.findFirst({
     where: {
       cpf: {
@@ -67,4 +69,4 @@ export async function getUserNotificationsByCpf(cpf: string) {
   });
 
   return notifications;
-}
+};

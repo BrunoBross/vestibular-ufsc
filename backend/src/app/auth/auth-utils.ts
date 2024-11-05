@@ -5,10 +5,10 @@ interface GetIsAuthenticateReturn {
   userToken?: string;
 }
 
-export async function getIsUserAuthenticated(
+export const getIsUserAuthenticated = async (
   fastify: FastifyInstance,
   request: FastifyRequest
-): Promise<GetIsAuthenticateReturn> {
+): Promise<GetIsAuthenticateReturn> => {
   try {
     await fastify.authenticate(request);
   } catch (error) {}
@@ -19,4 +19,4 @@ export async function getIsUserAuthenticated(
     isAuthenticated: !!userToken,
     userToken: userToken,
   };
-}
+};

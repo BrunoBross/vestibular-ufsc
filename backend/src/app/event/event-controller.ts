@@ -4,7 +4,7 @@ import { z } from "zod";
 import { getIsUserAuthenticated } from "../auth/auth-utils";
 import {
   findEventById,
-  getCandidateEventList,
+  getEventCandidateList,
   getEventList,
 } from "./event-service";
 
@@ -33,11 +33,11 @@ export const getCandidateEvents = async (fastify: FastifyInstance) => {
     "/event/candidate",
     { onRequest: [fastify.authenticate] },
     async (request, reply) => {
-      const candidateEventList = await getCandidateEventList(
+      const eventCandidateList = await getEventCandidateList(
         request.user.userToken
       );
 
-      reply.send({ candidateEventList });
+      reply.send({ eventCandidateList });
     }
   );
 };

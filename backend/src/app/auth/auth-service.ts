@@ -1,9 +1,9 @@
 import { ClientError } from "@/errors/client-error";
 import { axios } from "@/lib/axios";
 import { prisma } from "@/lib/prisma";
-import { LoginType } from "@/routes/auth/login";
+import { LoginType } from "./auth-controller";
 
-export async function loginUser({ cpf, password, expoToken }: LoginType) {
+export const loginUser = async ({ cpf, password, expoToken }: LoginType) => {
   const userToken: string = await axios
     .post("/api/v1/login", {
       cpf: cpf,
@@ -46,4 +46,4 @@ export async function loginUser({ cpf, password, expoToken }: LoginType) {
   }
 
   return userToken;
-}
+};

@@ -1,7 +1,7 @@
-import { loginUser } from "@/app/auth/auth-service";
 import { FastifyInstance } from "fastify";
 import { ZodTypeProvider } from "fastify-type-provider-zod";
 import { z } from "zod";
+import { loginUser } from "./auth-service";
 
 const loginBodySchema = z.object({
   cpf: z.string(),

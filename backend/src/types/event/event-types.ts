@@ -4,6 +4,13 @@ export interface Exam {
   examEndDate: Date;
 }
 
+export interface ExamLocation {
+  location: string;
+  section: string;
+  group: string;
+  order: number;
+}
+
 export enum PAA {
   PCD = "PESSOA_COM_DEFICIENCIA",
   PPI = "PRETO_PARDO_INDIGENA",
@@ -21,17 +28,20 @@ export interface Option {
 export interface Candidate {
   name: string;
   registrationCode: string;
+  registrationPaid: boolean;
   paa: PAA;
 }
 
+export interface Wait {
+  option: Option;
+  order: number;
+  category: string;
+  period: string;
+}
+
 export interface Result {
-  classified: {
-    option: Option;
-    order: number;
-    category: string;
-    period: string;
-  };
-  waitList: Option[];
+  classified: Wait;
+  waitList: Wait[];
 }
 
 export interface Event {
@@ -43,10 +53,12 @@ export interface Event {
   coursesAmount: number;
   modalities: string;
   image: string;
-  registration: boolean;
-  registrationPaid: boolean;
   examList: Exam[];
-  candidate?: Candidate;
-  options?: Option[];
-  result?: Result;
+}
+
+export interface EventCandidate extends Event {
+  examLocation: ExamLocation;
+  candidate: Candidate;
+  options: Option[];
+  result: Result;
 }

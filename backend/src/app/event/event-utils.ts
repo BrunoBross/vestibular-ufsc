@@ -1,22 +1,29 @@
 import { convertStringToDate } from "@/utils/format-date";
-import { Candidate, Event, Exam, Option, PAA, Result } from "./event-types";
+import {
+  Candidate,
+  Event,
+  EventCandidate,
+  Exam,
+  ExamLocation,
+  Option,
+  PAA,
+  Result,
+  Wait,
+} from "../../types/event/event-types";
 
 interface ParseEventProps {
   rawEvent: RawEvent;
-  rawEventCandidate?: RawCandidateEvent;
-  rawOptions?: RawOption[];
-  rawResult?: RawResult;
 }
 
-export function parseEvent({
-  rawEvent,
-  rawEventCandidate,
-  rawOptions,
-  rawResult,
-}: ParseEventProps): Event {
-  console.log(rawEvent);
+interface ParseEventCandidateProps extends ParseEventProps {
+  rawExamLocation: RawExamLocation;
+  rawEventCandidate: RawEventCandidate;
+  rawOptions: RawOption[];
+  rawResult: RawResult;
+}
 
-  return {
+export const parseEvent = ({ rawEvent }: ParseEventProps): Promise<Event> => {
+  return Promise.resolve({
     id: rawEvent.codigo_evento,
     eventName: rawEvent.nome,
     coursesAmount: rawEvent.qtd_cursos,
@@ -25,18 +32,35 @@ export function parseEvent({
     registrationStartDate: convertStringToDate(rawEvent.data_inicio_inscricao),
     registrationEndDate: convertStringToDate(rawEvent.data_fim_inscricao),
     image: rawEvent.imagem,
-    registration: !!rawEventCandidate,
-    registrationPaid: !!rawEventCandidate,
     examList: parseExamList(rawEvent.provas),
-    ...(rawEventCandidate && { candidate: parseCandidate(rawEventCandidate) }),
-    ...(rawOptions &&
-      rawOptions.length > 0 && { options: parseOptions(rawOptions) }),
-    ...(rawResult &&
-      rawResult.classificado && { result: parseResult(rawResult) }),
-  };
-}
+  });
+};
 
-function parseExamList(rawExamList: RawExam[]) {
+export const parseEventCandidate = async ({
+  rawEvent,
+  rawExamLocation,
+  rawEventCandidate,
+  rawOptions,
+  rawResult,
+}: ParseEventCandidateProps): Promise<EventCandidate> => {
+  const [event, examLocation, candidate, options, result] = await Promise.all([
+    parseEvent({ rawEvent }),
+    parseExamLocation(rawExamLocation),
+    parseCandidate(rawEventCandidate),
+    parseOptionList(rawOptions),
+    parseResult(rawResult),
+  ]);
+
+  return Promise.resolve({
+    ...event,
+    examLocation,
+    candidate,
+    options,
+    result,
+  });
+};
+
+const parseExamList = (rawExamList: RawExam[]) => {
   return rawExamList?.map((exam: RawExam) => {
     const parsedExam: Exam = {
       description: exam.descricao,
@@ -45,22 +69,68 @@ function parseExamList(rawExamList: RawExam[]) {
     };
     return parsedExam;
   });
-}
+};
 
-function parseOption(rawOption: RawOption): Option {
-  return {
+const parseExamLocation = (
+  rawExamLocation: RawExamLocation
+): Promise<ExamLocation | null> => {
+  if (!rawExamLocation) {
+    return null;
+  }
+
+  return Promise.resolve({
+    location: rawExamLocation.local,
+    section: rawExamLocation.setor,
+    group: rawExamLocation.grupo,
+    order: rawExamLocation.ordem,
+  });
+};
+
+const parseWait = async (rawWait: RawWait): Promise<Wait | null> => {
+  if (!rawWait) {
+    return null;
+  }
+
+  const parsedOption = await parseOption(rawWait.opcao);
+
+  return await Promise.resolve({
+    category: rawWait.categoria,
+    option: parsedOption,
+    order: rawWait.ordem,
+    period: rawWait.periodo,
+  });
+};
+
+const parseWaitList = async (rawWaitList: RawWait[]): Promise<Wait[]> => {
+  return await Promise.all(rawWaitList.map((rawWait) => parseWait(rawWait)));
+};
+
+const parseOption = (rawOption: RawOption): Promise<Option | null> => {
+  if (!rawOption) {
+    return null;
+  }
+
+  return Promise.resolve({
     campus: rawOption.curso.campus,
     name: rawOption.curso.nome,
-    classified: !!rawOption.indicador,
+    classified: rawOption.indicador === "Classificado",
     option: Number(rawOption.opcao),
-  };
-}
+  });
+};
 
-function parseOptions(rawOptionList: RawOption[]): Option[] {
-  return rawOptionList.map((option) => parseOption(option));
-}
+const parseOptionList = async (
+  rawOptionList: RawOption[]
+): Promise<Option[]> => {
+  return Promise.all(rawOptionList.map((option) => parseOption(option)));
+};
 
-function parseCandidate(rawCandidateEvent: RawCandidateEvent): Candidate {
+const parseCandidate = (
+  rawEventCandidate: RawEventCandidate
+): Promise<Candidate | null> => {
+  if (!rawEventCandidate) {
+    return null;
+  }
+
   const {
     nome,
     inscricao,
@@ -69,7 +139,7 @@ function parseCandidate(rawCandidateEvent: RawCandidateEvent): Candidate {
     paa_pcd,
     paa_ppi,
     paa_quilombola,
-  } = rawCandidateEvent;
+  } = rawEventCandidate;
 
   const enumeredPaa = paa
     ? paa_baixa_renda
@@ -81,23 +151,37 @@ function parseCandidate(rawCandidateEvent: RawCandidateEvent): Candidate {
       : paa_quilombola && PAA.QUILOMBOLA
     : null;
 
-  return {
+  return Promise.resolve({
     name: nome,
     registrationCode: inscricao,
-    ...(enumeredPaa && { paa: enumeredPaa }),
-  };
-}
+    registrationPaid: true,
+    paa: enumeredPaa,
+  });
+};
 
-function parseResult(rawResult: RawResult): Result {
-  return {
-    classified: rawResult.classificado
-      ? {
-          option: parseOption(rawResult.classificado.opcao),
-          category: rawResult.classificado.categoria,
-          order: rawResult.classificado.ordem,
-          period: rawResult.classificado.periodo,
-        }
-      : null,
-    waitList: parseOptions(rawResult.espera),
-  };
-}
+const parseResult = async (rawResult: RawResult): Promise<Result | null> => {
+  if (!rawResult) {
+    return null;
+  }
+
+  const parsedWaitList = await parseWaitList(rawResult.espera);
+
+  if (!rawResult.classificado) {
+    return Promise.resolve({
+      classified: null,
+      waitList: parsedWaitList,
+    });
+  }
+
+  const parsedOption = await parseOption(rawResult.classificado?.opcao);
+
+  return Promise.resolve({
+    classified: {
+      option: parsedOption,
+      category: rawResult.classificado.categoria,
+      order: rawResult.classificado.ordem,
+      period: rawResult.classificado.periodo,
+    },
+    waitList: parsedWaitList,
+  });
+};
