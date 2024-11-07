@@ -12,6 +12,8 @@ interface ExamLocationInfoProps extends CardProps {
 export function ExamLocationInfo(props: ExamLocationInfoProps) {
   const { examLocation, ...rest } = props;
 
+  console.log(examLocation);
+
   if (!examLocation) {
     return;
   }

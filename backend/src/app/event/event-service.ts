@@ -1,29 +1,34 @@
-import { Event, EventCandidate } from "../../types/event/event-types";
+import { ClientError } from "@/errors/client-error";
+import {
+  BasicEvent,
+  Event,
+  EventCandidate,
+  PerformanceReport,
+} from "../../types/event/event-types";
 import {
   findRawEventById,
   getRawEventCandidate,
   getRawEventList,
   getRawExamLocation,
   getRawOptions,
+  getRawPerformanceReport,
   getRawResults,
 } from "./event-requests";
 import {
   parseBasicEvent,
   parseEvent,
   parseEventCandidate,
+  parsePerformanceReport,
 } from "./event-utils";
 
-export const getEventList = async (
-  token: string
-): Promise<EventCandidate[]> => {
+export const getEventList = async (token: string): Promise<BasicEvent[]> => {
   const rawEventList = await getRawEventList();
 
   const parsedEventList = await Promise.all(
     rawEventList.map(async (rawEvent: RawEvent) => {
-      const rawEventCandidate = await getRawEventCandidate(
-        rawEvent.codigo_evento,
-        token
-      );
+      const rawEventCandidate = token
+        ? await getRawEventCandidate(rawEvent.codigo_evento, token)
+        : null;
 
       return await parseBasicEvent({
         rawEvent,
@@ -42,17 +47,13 @@ export const findEventById = async (
   const rawEvent = await findRawEventById(id);
 
   if (!token) {
-    return await parseEvent({
-      rawEvent,
-    });
+    return await parseEvent(rawEvent);
   }
 
   const rawEventCandidate = await getRawEventCandidate(id, token);
 
   if (!rawEventCandidate) {
-    return await parseEvent({
-      rawEvent,
-    });
+    return await parseEvent(rawEvent);
   }
 
   const [rawExamLocation, rawOptions, rawResult] = await Promise.all([
@@ -70,4 +71,25 @@ export const findEventById = async (
   });
 
   return eventCandidate;
+};
+
+export const findPerformanceReportByEventId = async (
+  eventId: number,
+  token: string
+): Promise<PerformanceReport> => {
+  const performanceReport = await getRawPerformanceReport(eventId, token);
+
+  if (
+    !performanceReport ||
+    !performanceReport.acertos ||
+    !performanceReport.notas
+  ) {
+    throw new ClientError("Performance not found.");
+  }
+
+  const parsedPerformanceReport = await parsePerformanceReport(
+    performanceReport
+  );
+
+  return parsedPerformanceReport;
 };

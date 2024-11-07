@@ -66,8 +66,10 @@ export function EventCard(props: EventCardProps) {
           </View>
         ) : (
           <View className="items-start">
-            {isAfter(new Date(), event.registrationEndDate) && (
+            {isAfter(new Date(), event.registrationEndDate) ? (
               <Badge text="Período de inscrição encerrado" badgeType="danger" />
+            ) : (
+              <Badge text="Inscrições abertas" badgeType="info" />
             )}
           </View>
         )}

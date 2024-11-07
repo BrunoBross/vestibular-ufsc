@@ -8,6 +8,40 @@ interface RawExamLocationResponse {
   local_prova: RawExamLocation;
 }
 
+interface RawPerformanceReport {
+  acertos: {
+    acertos_ptg: string;
+    acertos_lle: string;
+    acertos_mtm: string;
+    acertos_blg: string;
+    acertos_chs: string;
+    acertos_fsc: string;
+    acertos_qmc: string;
+    nota_redacao_sem_peso: string;
+    nota_discursiva_1_sem_peso: any;
+    nota_discursiva_2_sem_peso: any;
+    faltante_prova_1: boolean;
+    faltante_prova_2: boolean;
+  };
+  notas: {
+    nota_peso_ptg: string;
+    nota_peso_lle: string;
+    nota_peso_mtm: string;
+    nota_peso_blg: string;
+    nota_peso_chs: string;
+    nota_peso_fsc: string;
+    nota_peso_qmc: string;
+    nota_peso_redacao: string;
+    nota_peso_discursiva: any;
+    opcao: string;
+    nota_final: string;
+    curso: {
+      nome: string;
+      campus: string;
+    };
+  }[];
+}
+
 interface RawExamLocation {
   local: string;
   setor: string;
@@ -84,6 +118,9 @@ interface RawEventCandidate {
   evento: string;
   inscricao: string;
   nome: string;
+  homologado: boolean;
+  treineiro: boolean;
+  lingua: string;
   paa: boolean;
   paa_pcd: boolean;
   paa_ppi: boolean;

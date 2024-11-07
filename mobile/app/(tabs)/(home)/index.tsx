@@ -34,6 +34,8 @@ export interface Candidate {
   name: string;
   registrationCode: string;
   registrationPaid: boolean;
+  secondLanguage: string;
+  trainer: boolean;
   paa: string;
 }
 
@@ -87,7 +89,10 @@ export default function HomeScreen() {
     data: eventList,
     refetch: fetchEventList,
     isLoading,
-  } = useQuery("events", fetchEventQuery);
+  } = useQuery({
+    queryKey: ["events", token],
+    queryFn: fetchEventQuery,
+  });
 
   useEffect(() => {
     fetchEventList();

@@ -37,7 +37,7 @@ export function EventResultsInfo(props: EventResultsInfoProps) {
               <CardInfoText prefix="Categoria: ">
                 {result.classified.category}
               </CardInfoText>
-              <CardInfoText prefix="Ordem: ">
+              <CardInfoText prefix="Posição: ">
                 {result.classified.order}
               </CardInfoText>
               <CardInfoText prefix="Periodo: ">
@@ -71,6 +71,10 @@ export function EventResultsInfo(props: EventResultsInfoProps) {
                   <CardInfoText prefix="Campus: ">
                     {toTitleCase(option?.campus)}
                   </CardInfoText>
+                  <CardInfoText prefix="Categoria: ">
+                    {wait.category}
+                  </CardInfoText>
+                  <CardInfoText prefix="Posição: ">{wait.order}</CardInfoText>
                 </CardInfoBox>
               </Card>
             );

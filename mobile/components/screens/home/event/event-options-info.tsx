@@ -9,10 +9,11 @@ import { View } from "react-native";
 
 interface EventOptionsInfoProps extends CardProps {
   optionList?: Option[];
+  isFinishedTest: boolean;
 }
 
 export function EventOptionsInfo(props: EventOptionsInfoProps) {
-  const { optionList, ...rest } = props;
+  const { optionList, isFinishedTest, ...rest } = props;
 
   if (!optionList) {
     return;
@@ -39,10 +40,14 @@ export function EventOptionsInfo(props: EventOptionsInfoProps) {
                 {toTitleCase(option?.campus)}
               </CardInfoText>
               <View>
-                {option.classified ? (
+                {option.classified === true ? (
                   <Badge text="Classificado" badgeType="success" />
-                ) : (
+                ) : option.classified === false ? (
                   <Badge text="Não classificado" badgeType="danger" />
+                ) : (
+                  isFinishedTest && (
+                    <Badge text="Aguardando resultado" badgeType="warning" />
+                  )
                 )}
               </View>
             </CardInfoBox>

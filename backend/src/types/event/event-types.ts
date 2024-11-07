@@ -22,7 +22,22 @@ export interface Candidate {
   name: string;
   registrationCode: string;
   registrationPaid: boolean;
+  secondLanguage: string;
+  trainer: boolean;
   paa: string;
+}
+
+export interface PerformanceScore {
+  name: string;
+  score: number;
+  cutoffScore: number;
+  weight: number;
+  finalScore: number;
+}
+
+export interface PerformanceReport {
+  questions: PerformanceScore[];
+  finalScore: number;
 }
 
 export interface Wait {

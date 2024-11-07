@@ -13,19 +13,31 @@ interface CandidateDetailsInfo extends CardProps {
 export function CandidateDetailsInfo(props: CandidateDetailsInfo) {
   const { candidate, ...rest } = props;
 
+  if (!candidate) {
+    return;
+  }
+
   return (
     <View className="space-y-4" {...rest}>
       <ScreenContainerTitle>Informações do candidato</ScreenContainerTitle>
       <Card className="space-y-4" {...rest}>
         <CardInfoBox title="Candidato">
-          <CardInfoText>{toTitleCase(candidate?.name)}</CardInfoText>
+          <CardInfoText>{toTitleCase(candidate.name)}</CardInfoText>
         </CardInfoBox>
         <CardInfoBox title="Número de Inscrição">
-          <CardInfoText>{candidate?.registrationCode}</CardInfoText>
+          <CardInfoText>{candidate.registrationCode}</CardInfoText>
         </CardInfoBox>
         <CardInfoBox title="Política de Ações Afirmativas">
-          <CardInfoText>{candidate?.paa}</CardInfoText>
+          <CardInfoText>{candidate.paa}</CardInfoText>
         </CardInfoBox>
+        <View className="flex-row">
+          <CardInfoBox title="Segunda Língua" className="flex-1">
+            <CardInfoText>{toTitleCase(candidate.secondLanguage)}</CardInfoText>
+          </CardInfoBox>
+          <CardInfoBox title="Treineiro" className="flex-1">
+            <CardInfoText>{candidate.trainer ? "Sim" : "Não"}</CardInfoText>
+          </CardInfoBox>
+        </View>
       </Card>
     </View>
   );

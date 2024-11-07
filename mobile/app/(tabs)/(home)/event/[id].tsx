@@ -55,6 +55,11 @@ export default function EventDetailsScreen() {
     );
   }
 
+  const lastExamDate = event.examList.at(-1)?.examEndDate;
+  const isFinishedTest = lastExamDate
+    ? isAfter(new Date(), lastExamDate)
+    : false;
+
   return (
     <ScreenContainer
       canGoBack
@@ -68,11 +73,13 @@ export default function EventDetailsScreen() {
           {!event.candidate ? (
             <View className="items-start space-y-2">
               <Badge text="Incrição não realizada" badgeType="danger" />
-              {isAfter(new Date(), event.registrationEndDate) && (
+              {isAfter(new Date(), event.registrationEndDate) ? (
                 <Badge
                   text="Período de inscrição encerrado"
                   badgeType="danger"
                 />
+              ) : (
+                <Badge text="Inscrições abertas" badgeType="info" />
               )}
             </View>
           ) : (
@@ -97,20 +104,26 @@ export default function EventDetailsScreen() {
       {event.candidate && (
         <View className="space-y-4">
           <CandidateDetailsInfo candidate={event.candidate} />
-          {event.result ? (
+          {event.result &&
+          (event.result.classified || event.result?.waitList?.length > 0) ? (
             <EventResultsInfo result={event.result} />
           ) : (
-            <ExamLocationInfo examLocation={event.examLocation} />
+            event.examLocation && (
+              <ExamLocationInfo examLocation={event.examLocation} />
+            )
           )}
-          <EventOptionsInfo optionList={event.options} />
+          <EventOptionsInfo
+            optionList={event.options}
+            isFinishedTest={isFinishedTest}
+          />
         </View>
       )}
 
       {!event.examLocation && <EventDetailsInfo event={event} />}
 
-      <EventActions />
-
-      {!event.candidate && (
+      {event.candidate ? (
+        <EventActions isFinishedTest={isFinishedTest} />
+      ) : (
         <Button
           title="Inscrição"
           titleAlign="center"
