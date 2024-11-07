@@ -1,5 +1,7 @@
 import { LoginModel } from "@/components/screens/login/validator";
+import { LoadingContainer } from "@/components/ui/loading";
 import { axios } from "@/lib/axios";
+import { queryCLient } from "@/lib/query-client";
 import * as Notifications from "expo-notifications";
 import { createContext, ReactNode, useContext, useEffect } from "react";
 import { useMutation } from "react-query";
@@ -60,7 +62,13 @@ export function AuthProvider(props: AuthProviderProps) {
     } else {
       axios.defaults.headers.Authorization = null;
     }
+    queryCLient.invalidateQueries(["events"]);
+    queryCLient.invalidateQueries(["notification"]);
   }, [token]);
+
+  if (axios.defaults.headers.Authorization === undefined) {
+    return <LoadingContainer />;
+  }
 
   return (
     <AuthContext.Provider

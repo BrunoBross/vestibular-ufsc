@@ -4,6 +4,7 @@ import { CardInfoText } from "@/components/ui/card/card-info-text";
 import { LoadingContainer } from "@/components/ui/loading";
 import { ScreenContainer } from "@/components/ui/screen-container";
 import { axios } from "@/lib/axios";
+import { toTitleCase } from "@/utils/title-case";
 import { useLocalSearchParams, useNavigation } from "expo-router";
 import { Text, View } from "react-native";
 import { useQuery } from "react-query";
@@ -59,19 +60,16 @@ export default function IndividualPerformanceScreen() {
     >
       {performanceReport.map((performance) => {
         return (
-          <View
-            key={performance.name}
-            className="space-y-4 pb-4 border-zinc-500 border-b-[1px]"
-          >
+          <View key={performance.name} className="space-y-4">
             <CardInfoBox title="Curso">
-              <CardInfoText>{performance.name}</CardInfoText>
+              <CardInfoText>{toTitleCase(performance.name)}</CardInfoText>
             </CardInfoBox>
             <CardInfoBox title="Campus">
-              <CardInfoText>{performance.campus}</CardInfoText>
+              <CardInfoText>{toTitleCase(performance.campus)}</CardInfoText>
             </CardInfoBox>
             {performance.questions.map((question, index) => (
               <Card key={index}>
-                <CardInfoBox title={question.name}>
+                <CardInfoBox title={toTitleCase(question.name) || ""}>
                   <CardInfoText prefix="Acertos:">
                     {question.score}
                   </CardInfoText>

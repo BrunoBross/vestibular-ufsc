@@ -1,10 +1,8 @@
 import HeaderImage from "@/assets/images/app/header.png";
 import { EventList } from "@/components/screens/home/event-list";
 import { LoadingContainer } from "@/components/ui/loading";
-import { useAuth } from "@/contexts/auth/auth-context";
 import { axios } from "@/lib/axios";
 import { Feather } from "@expo/vector-icons";
-import { useEffect } from "react";
 import { Image, RefreshControl, ScrollView, Text, View } from "react-native";
 import { useQuery } from "react-query";
 import colors from "tailwindcss/colors";
@@ -83,20 +81,14 @@ const fetchEventQuery = (): Promise<BasicEvent[]> =>
   axios.get("/event").then(({ data }) => data.eventList);
 
 export default function HomeScreen() {
-  const { token } = useAuth();
-
   const {
     data: eventList,
     refetch: fetchEventList,
     isLoading,
   } = useQuery({
-    queryKey: ["events", token],
+    queryKey: ["events"],
     queryFn: fetchEventQuery,
   });
-
-  useEffect(() => {
-    fetchEventList();
-  }, [token]);
 
   return (
     <ScrollView
