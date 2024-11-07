@@ -36,6 +36,8 @@ export interface PerformanceScore {
 }
 
 export interface PerformanceReport {
+  name: string;
+  campus: string;
   questions: PerformanceScore[];
   finalScore: number;
 }

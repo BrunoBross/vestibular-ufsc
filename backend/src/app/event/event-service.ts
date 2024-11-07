@@ -76,7 +76,7 @@ export const findEventById = async (
 export const findPerformanceReportByEventId = async (
   eventId: number,
   token: string
-): Promise<PerformanceReport> => {
+): Promise<PerformanceReport[]> => {
   const performanceReport = await getRawPerformanceReport(eventId, token);
 
   if (

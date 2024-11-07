@@ -1,5 +1,4 @@
 import { convertStringToDate } from "@/utils/format-date";
-import { formatDecimal } from "@/utils/format-decimal";
 import {
   BasicEvent,
   Candidate,
@@ -9,6 +8,7 @@ import {
   ExamLocation,
   Option,
   PerformanceReport,
+  PerformanceScore,
   Result,
   Wait,
 } from "../../types/event/event-types";
@@ -57,108 +57,51 @@ export const parseBasicEvent = async ({
 };
 
 export const parsePerformanceReport = async (
-  performanceReport: RawPerformanceReport
-): Promise<PerformanceReport> => {
-  const firstGrades = performanceReport.notas[0];
+  rawPerformanceReport: RawPerformanceReport
+): Promise<PerformanceReport[]> => {
+  const dscScore =
+    Number(rawPerformanceReport.acertos.nota_discursiva_1_sem_peso) +
+    Number(rawPerformanceReport.acertos.nota_discursiva_2_sem_peso);
 
-  return Promise.resolve({
-    questions: [
-      {
-        name: "Português",
-        score: Number(performanceReport.acertos.acertos_ptg),
-        cutoffScore: 3,
-        weight: formatDecimal(
-          Number(firstGrades.nota_peso_ptg) /
-            Number(performanceReport.acertos.acertos_ptg)
-        ),
-        finalScore: Number(firstGrades.nota_peso_ptg),
-      },
-      {
-        name: "Segunda Língua",
-        score: Number(performanceReport.acertos.acertos_lle),
-        cutoffScore: 3,
-        weight: formatDecimal(
-          Number(firstGrades.nota_peso_lle) /
-            Number(performanceReport.acertos.acertos_lle)
-        ),
-        finalScore: Number(firstGrades.nota_peso_lle),
-      },
-      {
-        name: "Matemática",
-        score: Number(performanceReport.acertos.acertos_mtm),
-        cutoffScore: 3,
-        weight: formatDecimal(
-          Number(firstGrades.nota_peso_mtm) /
-            Number(performanceReport.acertos.acertos_mtm)
-        ),
-        finalScore: Number(firstGrades.nota_peso_mtm),
-      },
-      {
-        name: "Biologia",
-        score: Number(performanceReport.acertos.acertos_blg),
-        cutoffScore: 3,
-        weight: formatDecimal(
-          Number(firstGrades.nota_peso_blg) /
-            Number(performanceReport.acertos.acertos_blg)
-        ),
-        finalScore: Number(firstGrades.nota_peso_blg),
-      },
-      {
-        name: "Ciências Humanas e Sociais",
-        score: Number(performanceReport.acertos.acertos_chs),
-        cutoffScore: 3,
-        weight: formatDecimal(
-          Number(firstGrades.nota_peso_chs) /
-            Number(performanceReport.acertos.acertos_chs)
-        ),
-        finalScore: Number(firstGrades.nota_peso_chs),
-      },
-      {
-        name: "Física",
-        score: Number(performanceReport.acertos.acertos_fsc),
-        cutoffScore: 3,
-        weight: formatDecimal(
-          Number(firstGrades.nota_peso_fsc) /
-            Number(performanceReport.acertos.acertos_fsc)
-        ),
-        finalScore: Number(firstGrades.nota_peso_fsc),
-      },
-      {
-        name: "Química",
-        score: Number(performanceReport.acertos.acertos_qmc),
-        cutoffScore: 3,
-        weight: formatDecimal(
-          Number(firstGrades.nota_peso_qmc) /
-            Number(performanceReport.acertos.acertos_qmc)
-        ),
-        finalScore: Number(firstGrades.nota_peso_qmc),
-      },
-      {
-        name: "Redação",
-        score: Number(performanceReport.acertos.nota_redacao_sem_peso),
-        cutoffScore: 3,
-        weight: formatDecimal(
-          Number(firstGrades.nota_peso_redacao) /
-            Number(performanceReport.acertos.nota_redacao_sem_peso)
-        ),
-        finalScore: Number(firstGrades.nota_peso_redacao),
-      },
-      {
-        name: "Discursiva",
-        score:
-          Number(performanceReport.acertos.nota_discursiva_1_sem_peso) +
-          Number(performanceReport.acertos.nota_discursiva_2_sem_peso),
-        cutoffScore: 3,
-        weight: formatDecimal(
-          Number(firstGrades.nota_peso_discursiva) /
-            (Number(performanceReport.acertos.nota_discursiva_1_sem_peso) +
-              Number(performanceReport.acertos.nota_discursiva_2_sem_peso))
-        ),
-        finalScore: Number(firstGrades.nota_peso_discursiva),
-      },
-    ],
-    finalScore: Number(firstGrades.nota_final),
-  });
+  return await Promise.all(
+    rawPerformanceReport.notas.map(async (grades) => {
+      const questions: PerformanceReport["questions"] = await Promise.all(
+        grades.pesos_cortes.map((weights): PerformanceScore => {
+          const acronym = weights.sigla_disciplina.toLocaleLowerCase();
+
+          const isRdc = acronym === "rdc";
+          const isDsc = acronym === "dsc";
+
+          const scoreKey = isRdc
+            ? "nota_redacao_sem_peso"
+            : (`acertos_${acronym}` as keyof RawPerformanceReport["acertos"]);
+
+          const finalScoreKey = isRdc
+            ? "nota_peso_redacao"
+            : isDsc
+            ? "nota_peso_discursiva"
+            : (`nota_peso_${acronym}` as keyof typeof grades);
+
+          return {
+            name: weights.disciplina,
+            score: Number(
+              isDsc ? dscScore : rawPerformanceReport.acertos[scoreKey] ?? 0
+            ),
+            finalScore: Number(grades[finalScoreKey] ?? 0),
+            weight: Number(weights.peso),
+            cutoffScore: Number(weights.corte),
+          };
+        })
+      );
+
+      return Promise.resolve({
+        name: grades.curso.nome,
+        campus: grades.curso.campus,
+        questions: questions,
+        finalScore: Number(grades.nota_final),
+      });
+    })
+  );
 };
 
 export const parseEventCandidate = async ({

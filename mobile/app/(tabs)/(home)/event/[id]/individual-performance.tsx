@@ -5,7 +5,7 @@ import { LoadingContainer } from "@/components/ui/loading";
 import { ScreenContainer } from "@/components/ui/screen-container";
 import { axios } from "@/lib/axios";
 import { useLocalSearchParams, useNavigation } from "expo-router";
-import { Text } from "react-native";
+import { Text, View } from "react-native";
 import { useQuery } from "react-query";
 
 export interface PerformanceScore {
@@ -17,13 +17,15 @@ export interface PerformanceScore {
 }
 
 export interface PerformanceReport {
+  name: string;
+  campus: string;
   questions: PerformanceScore[];
   finalScore: number;
 }
 
 const fetchPerformanceReportByEventIdQuery = (
   eventId: string
-): Promise<PerformanceReport> =>
+): Promise<PerformanceReport[]> =>
   axios
     .get(`/event/${eventId}/performance`)
     .then(({ data }) => data.performanceReport);
@@ -55,29 +57,40 @@ export default function IndividualPerformanceScreen() {
       canGoBack
       className="space-y-4"
     >
-      {performanceReport.questions.map((question, index) => {
-        if (!question.score) {
-          return;
-        }
-
+      {performanceReport.map((performance) => {
         return (
-          <Card key={index}>
-            <CardInfoBox title={question.name}>
-              <CardInfoText prefix="Acertos:">{question.score}</CardInfoText>
-              <CardInfoText prefix="Corte:">
-                {question.cutoffScore}
-              </CardInfoText>
-              <CardInfoText prefix="Peso:">{question.weight}</CardInfoText>
-              <CardInfoText prefix="Pontuação:">
-                {question.finalScore}
-              </CardInfoText>
+          <View
+            key={performance.name}
+            className="space-y-4 pb-4 border-zinc-500 border-b-[1px]"
+          >
+            <CardInfoBox title="Curso">
+              <CardInfoText>{performance.name}</CardInfoText>
             </CardInfoBox>
-          </Card>
+            <CardInfoBox title="Campus">
+              <CardInfoText>{performance.campus}</CardInfoText>
+            </CardInfoBox>
+            {performance.questions.map((question, index) => (
+              <Card key={index}>
+                <CardInfoBox title={question.name}>
+                  <CardInfoText prefix="Acertos:">
+                    {question.score}
+                  </CardInfoText>
+                  <CardInfoText prefix="Corte:">
+                    {question.cutoffScore}
+                  </CardInfoText>
+                  <CardInfoText prefix="Peso:">{question.weight}</CardInfoText>
+                  <CardInfoText prefix="Pontuação:">
+                    {question.finalScore}
+                  </CardInfoText>
+                </CardInfoBox>
+              </Card>
+            ))}
+            <Text className="text-base font-semibold text-right">
+              Pontuação final: {performance.finalScore}
+            </Text>
+          </View>
         );
       })}
-      <Text className="text-base font-semibold text-right">
-        Pontuação final: {performanceReport.finalScore}
-      </Text>
     </ScreenContainer>
   );
 }

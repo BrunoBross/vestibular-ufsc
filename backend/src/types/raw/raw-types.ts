@@ -18,8 +18,8 @@ interface RawPerformanceReport {
     acertos_fsc: string;
     acertos_qmc: string;
     nota_redacao_sem_peso: string;
-    nota_discursiva_1_sem_peso: any;
-    nota_discursiva_2_sem_peso: any;
+    nota_discursiva_1_sem_peso: string;
+    nota_discursiva_2_sem_peso: string;
     faltante_prova_1: boolean;
     faltante_prova_2: boolean;
   };
@@ -32,13 +32,19 @@ interface RawPerformanceReport {
     nota_peso_fsc: string;
     nota_peso_qmc: string;
     nota_peso_redacao: string;
-    nota_peso_discursiva: any;
+    nota_peso_discursiva: string;
     opcao: string;
     nota_final: string;
     curso: {
       nome: string;
       campus: string;
     };
+    pesos_cortes: {
+      corte: string;
+      peso: string;
+      disciplina: string;
+      sigla_disciplina: string;
+    }[];
   }[];
 }
 

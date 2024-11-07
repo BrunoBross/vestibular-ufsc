@@ -3,6 +3,7 @@ import { axios, axiosHmg } from "@/lib/axios";
 import { prisma } from "@/lib/prisma";
 import { LoginType } from "./auth-controller";
 
+// APENAS PARA TESTAR AS CONTAS DE HOMOLOGAÇAO
 const loginUserHMG = async ({ cpf, password }: LoginType) =>
   axiosHmg
     .post("/api/v1/login", {
